@@ -3,26 +3,26 @@
 import React, { useState, useEffect } from 'react';
 
 export default function RootPage() {
-  const [duration, setDuration] = useState(() => {
+  const [duration, setDuration] = useState(25); // Default duration in minutes
+  const [timeLeft, setTimeLeft] = useState(25 * 60); // Time left in seconds
+  const [isActive, setIsActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [category, setCategory] = useState('Category');
+
+  // Use useEffect to set the initial state from localStorage on the client side
+  useEffect(() => {
     const savedDuration = localStorage.getItem('duration');
-    return savedDuration ? parseInt(savedDuration) : 25;
-  }); // Default duration in minutes
-  const [timeLeft, setTimeLeft] = useState(() => {
     const savedTimeLeft = localStorage.getItem('timeLeft');
-    return savedTimeLeft ? parseInt(savedTimeLeft) : duration * 60;
-  }); // Time left in seconds
-  const [isActive, setIsActive] = useState(() => {
     const savedIsActive = localStorage.getItem('isActive');
-    return savedIsActive ? JSON.parse(savedIsActive) : false;
-  });
-  const [isPaused, setIsPaused] = useState(() => {
     const savedIsPaused = localStorage.getItem('isPaused');
-    return savedIsPaused ? JSON.parse(savedIsPaused) : false;
-  });
-  const [category, setCategory] = useState(() => {
     const savedCategory = localStorage.getItem('category');
-    return savedCategory ? savedCategory : 'Category';
-  });
+
+    if (savedDuration) setDuration(parseInt(savedDuration));
+    if (savedTimeLeft) setTimeLeft(parseInt(savedTimeLeft));
+    if (savedIsActive) setIsActive(JSON.parse(savedIsActive));
+    if (savedIsPaused) setIsPaused(JSON.parse(savedIsPaused));
+    if (savedCategory) setCategory(savedCategory);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('duration', duration.toString());
@@ -98,9 +98,9 @@ export default function RootPage() {
     <main className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 p-5">
       <div className="p-10 text-center" style={{ width: '300px', height: '300px' }}>
         <div className="p-4 mb-4 border-purple-500 bg-white bg-opacity-30 rounded-lg shadow-lg text-6xl flex flex-col items-center justify-center h-full text-black">
-          <div className="mb-5 text-black bg-opacity-100 w-full">
+          <div className="mb-5 text-black bg-opacity-100 w-full relative">
             {!isActive ? (
-              <div className=" w-full">
+              <div className="relative w-full">
                 <input
                   type="text"
                   value={category}
