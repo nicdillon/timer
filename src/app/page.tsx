@@ -131,10 +131,10 @@ export default function RootPage() {
           </div>
         </div>
         <div className="flex gap-3 mb-5 justify-center">
-          {!isActive && <button onClick={handleStart} className="px-4 py-2 bg-purple-500 text-white rounded">Start</button>}
-          {isActive && !isPaused && <button onClick={handlePause} className="px-4 py-2 bg-yellow-500 text-white rounded">Pause</button>}
-          {isActive && isPaused && <button onClick={handleResume} className="px-4 py-2 bg-green-500 text-white rounded">Resume</button>}
-          {isActive && <button onClick={handleStop} className="px-4 py-2 bg-red-500 text-white rounded">Stop</button>}
+          {!isActive && <button onClick={handleStart} className="px-4 py-2 border-2 border-purple-500 bg-purple-500 text-white rounded">Start</button>}
+          {isActive && !isPaused && <button onClick={handlePause} className="px-4 py-2 border-2 border-purple-500 bg-yellow-500 text-white rounded">Pause</button>}
+          {isActive && isPaused && <button onClick={handleResume} className="px-4 py-2 border-2 border-purple-500 bg-green-500 text-white rounded">Resume</button>}
+          {isActive && <button onClick={handleStop} className="px-4 py-2 bg-red-500 border-2 border-purple-500 text-white rounded">Stop</button>}
         </div>
       </div>
     </main>
