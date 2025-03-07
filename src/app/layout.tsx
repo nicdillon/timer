@@ -29,6 +29,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 </Link>
               </li>
               <li className="mb-2 md:mb-0">
+                <Link href="/analytics" className="block text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
+                  Analytics
+                </Link>
+              </li>
+              <li className="mb-2 md:mb-0">
                 <Link href="/settings" className="block text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
                   Settings
                 </Link>
@@ -36,11 +41,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <li className="mb-2 md:mb-0">
                 <Link href="/profile" className="block text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
                   Profile
-                </Link>
-              </li>
-              <li className="mb-2 md:mb-0">
-                <Link href="/analytics" className="block text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
-                  Analytics
                 </Link>
               </li>
             </ul>

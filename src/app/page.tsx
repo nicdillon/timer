@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { saveFocusSession, FocusSession } from './lib/saveFocusSession';
 
@@ -10,6 +10,7 @@ export default function RootPage() {
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [category, setCategory] = useState('Category');
+  const hasFinished = useRef(false);
 
   // Use useEffect to set the initial state from localStorage on the client side
   useEffect(() => {
@@ -37,22 +38,32 @@ export default function RootPage() {
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
+    // Only start the interval if the timer is active and not paused
     if (isActive && !isPaused) {
       interval = setInterval(() => {
-        setTimeLeft((timeLeft) => {
-          if (timeLeft > 0) {
-            return timeLeft - 1;
+        setTimeLeft((prevTime) => {
+          // If more than one second remains, decrease the timeLeft
+          if (prevTime > 1) {
+            return prevTime - 1;
           } else {
-            handleTimerFinish();
+            // Clear the interval immediately to avoid calling handleTimerFinish more than once
+            if (interval) {
+              clearInterval(interval);
+            }
+            // Call handleTimerFinish once when timer reaches zero
+            if (prevTime === 1) {
+              handleTimerFinish();
+            }
             return 0;
           }
         });
       }, 1000);
-    } else if (!isActive && timeLeft !== 0) {
-      clearInterval(interval!);
     }
 
-    return () => clearInterval(interval!);
+    // Cleanup: clear the interval when the effect or component is unmounted
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [isActive, isPaused, timeLeft]);
 
   const { user, error } = useUser();
@@ -64,6 +75,7 @@ export default function RootPage() {
   const handleStart = () => {
     setIsActive(true);
     setIsPaused(false);
+    hasFinished.current = false;
   };
 
   const handlePause = () => {
@@ -72,6 +84,7 @@ export default function RootPage() {
 
   const handleResume = () => {
     setIsPaused(false);
+    hasFinished.current = false;
   };
 
   const handleStop = () => {
@@ -97,16 +110,18 @@ export default function RootPage() {
 
   // Updated handleTimerFinish function to call saveFocusSession when a focus session ends
   const handleTimerFinish = async () => {
-    // Notify the user that the time is up
-    alert('Time is up!');
+    if (hasFinished.current) return;
+    hasFinished.current = true;
+    setTimeLeft(duration * 60);
     // Play an alarm sound
-    const audio = new Audio('/alarm.mp3');
+    const audio = new Audio('/alarm.wav');
     audio.play();
+
     // Deactivate the timer
     setIsActive(false);
 
     // Capture the user ID from the Auth0 authentication context
-    // If the user is not authenticated, fallback don't save the session
+    // If the user is not authenticated, don't save the session
     const userId = user ? user.sub : null;
     if (!userId) {
       console.error('User is not authenticated. Focus session not saved.');
@@ -120,17 +135,10 @@ export default function RootPage() {
       duration,                 // Duration of the session (from state)
       start_time: new Date(),   // Timestamp when the session started (update if you maintain a separate start time)
     };
-
+    console.log('Saving focus session:', sessionData);
     // Attempt to save the focus session using the Supabase client
     try {
-      const result = await saveFocusSession(sessionData);
-      if (result === null) {
-        // Log an error if saving failed
-        console.error('Failed to save the focus session.');
-      } else {
-        // Log the response data when successful
-        console.log('Focus session saved successfully:', result);
-      }
+      await saveFocusSession(sessionData);
     } catch (err) {
       // Catch any unexpected errors during the API call
       console.error('Error saving focus session:', err);
@@ -138,7 +146,7 @@ export default function RootPage() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 p-5">
+    <main className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 p-5">
       <div className="p-10 text-center" style={{ width: '300px', height: '300px' }}>
         <div className="p-4 mb-4 border-purple-500 bg-white bg-opacity-30 rounded-lg shadow-lg text-6xl flex flex-col items-center justify-center h-full text-black">
           <div className="mb-5 text-black bg-opacity-100 w-full relative">
@@ -174,10 +182,10 @@ export default function RootPage() {
           </div>
         </div>
         <div className="flex gap-3 mb-5 justify-center">
-          {!isActive && <button onClick={handleStart} className="px-4 py-2 border-2 border-purple-500 bg-purple-500 text-white rounded">Start</button>}
-          {isActive && !isPaused && <button onClick={handlePause} className="px-4 py-2 border-2 border-purple-500 bg-yellow-500 text-white rounded">Pause</button>}
-          {isActive && isPaused && <button onClick={handleResume} className="px-4 py-2 border-2 border-purple-500 bg-green-500 text-white rounded">Resume</button>}
-          {isActive && <button onClick={handleStop} className="px-4 py-2 bg-red-500 border-2 border-purple-500 text-white rounded">Stop</button>}
+          {!isActive && <button onClick={handleStart} className="px-4 py-2  bg-purple-600 text-white rounded">Start</button>}
+          {isActive && !isPaused && <button onClick={handlePause} className="px-4 py-2  bg-yellow-600 text-white rounded">Pause</button>}
+          {isActive && isPaused && <button onClick={handleResume} className="px-4 py-2  bg-green-600 text-white rounded">Resume</button>}
+          {isActive && <button onClick={handleStop} className="px-4 py-2 bg-red-600  text-white rounded">Stop</button>}
         </div>
       </div>
     </main>

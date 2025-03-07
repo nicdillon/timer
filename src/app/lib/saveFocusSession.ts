@@ -12,7 +12,7 @@ export interface FocusSession {
  * @param session - The focus session data.
  * @returns The inserted data if successful, or null if an error occurred.
  */
-export async function saveFocusSession(session: FocusSession): Promise<any> {
+export async function saveFocusSession(session: FocusSession): Promise<void> {
   try {
     const { data, error } = await supabase
       .from('focus_sessions')
@@ -25,12 +25,12 @@ export async function saveFocusSession(session: FocusSession): Promise<any> {
 
     if (error) {
       console.error('Error saving focus session:', error);
-      return null;
+      return;
     }
-
-    return data;
+    console.log('Focus session saved successfully:', data);
+    return;
   } catch (err) {
     console.error('Unexpected error saving focus session:', err);
-    return null;
+    return;
   }
 }
