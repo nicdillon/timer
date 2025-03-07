@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { saveFocusSession, FocusSession } from './lib/saveFocusSession';
 
 export default function RootPage() {
   const [duration, setDuration] = useState(25); // Default duration in minutes
@@ -53,6 +55,12 @@ export default function RootPage() {
     return () => clearInterval(interval!);
   }, [isActive, isPaused, timeLeft]);
 
+  const { user, error } = useUser();
+
+  if (error) {
+    console.log("Error loading user:", error);
+  }
+
   const handleStart = () => {
     setIsActive(true);
     setIsPaused(false);
@@ -87,11 +95,46 @@ export default function RootPage() {
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
-  const handleTimerFinish = () => {
+  // Updated handleTimerFinish function to call saveFocusSession when a focus session ends
+  const handleTimerFinish = async () => {
+    // Notify the user that the time is up
     alert('Time is up!');
+    // Play an alarm sound
     const audio = new Audio('/alarm.mp3');
     audio.play();
+    // Deactivate the timer
     setIsActive(false);
+
+    // Capture the user ID from the Auth0 authentication context
+    // If the user is not authenticated, fallback don't save the session
+    const userId = user ? user.sub : null;
+    if (!userId) {
+      console.error('User is not authenticated. Focus session not saved.');
+      return;
+    }
+
+    // Build the focus session data object
+    const sessionData: FocusSession = {
+      user_id: userId,          // Authenticated user's ID
+      category,                 // Focus session category (from state)
+      duration,                 // Duration of the session (from state)
+      start_time: new Date(),   // Timestamp when the session started (update if you maintain a separate start time)
+    };
+
+    // Attempt to save the focus session using the Supabase client
+    try {
+      const result = await saveFocusSession(sessionData);
+      if (result === null) {
+        // Log an error if saving failed
+        console.error('Failed to save the focus session.');
+      } else {
+        // Log the response data when successful
+        console.log('Focus session saved successfully:', result);
+      }
+    } catch (err) {
+      // Catch any unexpected errors during the API call
+      console.error('Error saving focus session:', err);
+    }
   };
 
   return (
@@ -140,17 +183,3 @@ export default function RootPage() {
     </main>
   );
 }
-
-// Future Cloud DB Integration
-// To integrate with a cloud backend, you can add API calls in the handleStart, handleStop, and handleCategoryChange functions
-// Example:
-// const saveSession = async () => {
-//   await fetch('/api/save-session', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({ duration, category, timeLeft }),
-//   });
-// };
-// Call saveSession() in the appropriate places to save the session data
