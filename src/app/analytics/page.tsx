@@ -27,6 +27,7 @@ export default function AnalyticsPage() {
   const [sessions, setSessions] = useState<FocusSession[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isTableExpanded, setIsTableExpanded] = useState<boolean>(false);
 
   // Pagination state.
   const [page, setPage] = useState(0);
@@ -46,8 +47,12 @@ export default function AnalyticsPage() {
         }
         const data = await res.json();
         setSessions(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -135,103 +140,124 @@ export default function AnalyticsPage() {
     value,
   }));
 
+  function handleExpandTable(): void {
+    setIsTableExpanded((prev) => !prev);
+  }
+
   return (
     <div className="p-4 pt-20 flex flex-col items-center justify-center min-h-screen w-auto max-w-screen">
       <h1 className="text-3xl font-bold mb-4">Your Focus Sessions</h1>
 
       {/* Charts section */}
-      <div className="flex flex-wrap justify-center gap-5 mb-5">
-        <Paper className="p-3">
-          <h2 className="text-xl text-center mb-2">Focus Time by Category</h2>
-          <PieChart
-            series={[
-              {
-                data: dataByCategory,
-                innerRadius: 30,
-                outerRadius: 100,
-                paddingAngle: 5,
-                cornerRadius: 5,
-                arcLabel: (item) => `${item.label}: ${item.value}`,
-                arcLabelMinAngle: 30,
-              },
-            ]}
-            width={chartWidth}
-            height={200}
-          />
-        </Paper>
-        <Paper className="p-3">
-          <h2 className="text-xl text-center mb-2">Focus Time by Day of Week</h2>
-          <PieChart
-            series={[
-              {
-                data: dataByDay,
-                innerRadius: 30,
-                outerRadius: 100,
-                paddingAngle: 5,
-                cornerRadius: 5,
-                arcLabel: (item) => `${item.label}: ${item.value}`,
-                arcLabelMinAngle: 30,
-              },
-            ]}
-            width={chartWidth}
-            height={200}
-          />
-        </Paper>
-        <Paper className="p-3">
-          <h2 className="text-xl text-center mb-2">Focus Time by Duration</h2>
-          <PieChart
-            series={[
-              {
-                data: dataByDuration,
-                innerRadius: 30,
-                outerRadius: 100,
-                paddingAngle: 5,
-                cornerRadius: 5,
-                arcLabel: (item) => `${item.label}: ${item.value}`,
-                arcLabelMinAngle: 30,
-              },
-            ]}
-            width={chartWidth}
-            height={200}
-          />
-        </Paper>
-      </div>
+      {sessions && sessions.length > 0 ? (
+        <div className="flex flex-wrap justify-center gap-5 mb-5">
+          <Paper className="p-3">
+            <h2 className="text-xl text-center mb-2">Total Focus Time by Category</h2>
+            <PieChart
+              series={[
+                {
+                  data: dataByCategory,
+                  innerRadius: 30,
+                  outerRadius: 100,
+                  paddingAngle: 5,
+                  cornerRadius: 5,
+                  arcLabel: (item) => `${item.label}: ${item.value}`,
+                  arcLabelMinAngle: 30,
+                },
+              ]}
+              colors={['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']}
+              width={chartWidth}
+              height={200}
+            />
+          </Paper>
+          <Paper className="p-3">
+            <h2 className="text-xl text-center mb-2">Total Focus Time by Day of Week</h2>
+            <PieChart
+              series={[
+                {
+                  data: dataByDay,
+                  innerRadius: 30,
+                  outerRadius: 100,
+                  paddingAngle: 5,
+                  cornerRadius: 5,
+                  arcLabel: (item) => `${item.label}: ${item.value}`,
+                  arcLabelMinAngle: 30,
+                },
+              ]}
+              colors={['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']}
+              width={chartWidth}
+              height={200}
+            />
+          </Paper>
+          <Paper className="p-3">
+            <h2 className="text-xl text-center mb-2">Focus Sessions by Duration</h2>
+            <PieChart
+              series={[
+                {
+                  data: dataByDuration,
+                  innerRadius: 30,
+                  outerRadius: 100,
+                  paddingAngle: 5,
+                  cornerRadius: 5,
+                  arcLabel: (item) => `${item.label}: ${item.value}`,
+                  arcLabelMinAngle: 30,
+                },
+              ]}
+              colors={['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']}
+              width={chartWidth}
+              height={200}
+            />
+          </Paper>
+        </div>
+      ) : (
+        <p className="text-lg text-gray-700">No focus sessions found.</p>
+      )}
 
       {/* The table displaying individual focus sessions */}
-      {sessions && sessions.length > 0 ? (
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-          <TableContainer className="bg-white bg-opacity-30 backdrop-blur-md shadow-lg w-full">
-            <Table stickyHeader aria-label="focus sessions table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Duration</TableCell>
-                  <TableCell>Start Time</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sessions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((session: FocusSession) => (
-                  <TableRow hover key={session.id ?? session.start_time}>
-                    <TableCell>{session.category}</TableCell>
-                    <TableCell>{session.duration}</TableCell>
-                    <TableCell>{new Date(session.start_time).toLocaleString()}</TableCell>
+      {sessions && sessions.length > 0 && !isTableExpanded && (
+        <div>
+          <button onClick={handleExpandTable} className="bg-purple-500 text-white px-4 py-2 rounded">
+            Show All Focus Sessions
+          </button>
+        </div>
+      )}
+      {sessions && sessions.length > 0 && isTableExpanded && (
+        <div className="flex flex-col width-full gap-2 justify-center items-center">
+          <button onClick={handleExpandTable} className="bg-purple-500 text-white px-4 py-2 rounded w-auto">
+            Hide All Focus Sessions
+          </button>
+          <Paper className="shadow-lg" sx={{ width: '100%', overflow: 'hidden' }}>
+            <TableContainer className="bg-white bg-opacity-30 backdrop-blur-md  w-full">
+              <Table stickyHeader aria-label="focus sessions table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Category</TableCell>
+                    <TableCell>Duration</TableCell>
+                    <TableCell>Start Time</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={sessions.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Paper>
-      ) : (
-        <p>No focus sessions found.</p>
+                </TableHead>
+                <TableBody>
+                  {sessions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((session: FocusSession) => (
+                    <TableRow hover key={session.id ?? session.start_time}>
+                      <TableCell>{session.category}</TableCell>
+                      <TableCell>{session.duration}</TableCell>
+                      <TableCell>{new Date(session.start_time).toLocaleString()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={sessions.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Paper>
+        </div>
       )}
     </div>
   );

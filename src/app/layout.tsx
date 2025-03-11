@@ -5,20 +5,23 @@ import './globals.css';
 import Link from 'next/link';
 import { ReactNode, useState } from 'react';
 import { TimerProvider } from './TimerContext';
-import TimerOverlay from './TimerOverlay';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import TimerIcon from '@mui/icons-material/Timer';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
+import dynamic from 'next/dynamic';
 
 function LayoutContent({ children }: { children: ReactNode }) {
   // Now always include TimerOverlay so it can animate between positions.
+
+  const TimerOverlayNoSSR = dynamic(() => import('./TimerOverlay'), {ssr: false})
+
   return (
     <div className='flex flex-col md:flex-row'>
       <main className="flex-grow md:ml-1/4">{children}</main>
-      <TimerOverlay />
+      <TimerOverlayNoSSR />
     </div>
   );
 }
@@ -51,22 +54,22 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </div>
               <ul className={`flex-col md:flex-row md:gap-4 w-full md:flex ${menuOpen ? 'flex' : 'hidden'}`}>
                 <li className="mb-2 md:mb-0">
-                  <Link href="/" title="Timer" className="flex justify-center items-center gap-2 block text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
+                  <Link href="/" title="Timer" className="flex justify-center items-center gap-2  text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
                     <TimerIcon fontSize="large" />
                   </Link>
                 </li>
                 <li className="mb-2 md:mb-0">
-                  <Link href="/analytics" title="Analytics" className="flex justify-center items-center gap-2 block text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
+                  <Link href="/analytics" title="Analytics" className="flex justify-center items-center gap-2  text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
                     <AssessmentIcon fontSize="large" />
                   </Link>
                 </li>
                 <li className="mb-2 md:mb-0">
-                  <Link href="/settings" title="Settings" className="flex justify-center items-center gap-2 block text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
+                  <Link href="/settings" title="Settings" className="flex justify-center items-center gap-2  text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
                     <SettingsApplicationsIcon fontSize="large" />
                   </Link>
                 </li>
                 <li className="mb-2 md:mb-0">
-                  <Link href="/profile" title="Profile" className="flex justify-center items-center gap-2 block text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
+                  <Link href="/profile" title="Profile" className="flex justify-center items-center gap-2  text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg">
                     <AccountBoxIcon fontSize="large" />
                   </Link>
                 </li>
