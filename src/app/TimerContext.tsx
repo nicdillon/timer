@@ -43,7 +43,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
   const [isPaused, setIsPaused] = useState(false);
   const [category, setCategory] = useState('Category');
   const hasFinished = useRef(false);
-  const { user } = useUser();
+  const { user, isLoading, error } = useUser();
 
   // Load saved state from localStorage on mount
   useEffect(() => {
@@ -133,6 +133,11 @@ export function TimerProvider({ children }: { children: ReactNode }) {
     const audio = new Audio('/alarm.wav');
     audio.play();
     setIsActive(false);
+    if (isLoading) return;
+    if (error) {
+      console.error('Error fetching user:', error);
+      return;
+    }
     const userId = user ? user.sub : null;
     if (!userId) {
       console.error('User is not authenticated. Focus session not saved.');
