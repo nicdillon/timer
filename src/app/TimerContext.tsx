@@ -12,6 +12,8 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { saveFocusSession, FocusSession } from './lib/saveFocusSession';
 
 interface TimerContextProps {
+  overlayPosition: OverlayPosition;
+  setOverlayPosition: (position: OverlayPosition) => void;
   duration: number;
   timeLeft: number;
   isActive: boolean;
@@ -26,6 +28,11 @@ interface TimerContextProps {
   formatTime: (seconds: number) => string;
 }
 
+interface OverlayPosition {
+  x: number;
+  y: number;
+}
+
 const TimerContext = createContext<TimerContextProps | undefined>(undefined);
 
 export const useTimer = () => {
@@ -36,7 +43,19 @@ export const useTimer = () => {
   return context;
 };
 
-export function TimerProvider({ children }: { children: ReactNode }) {
+export function useTimerContext() {
+  const context = useContext(TimerContext);
+  if (!context) {
+    throw new Error('useTimerContext must be used within a TimerProvider');
+  }
+  return context;
+}
+
+export default function TimerProvider({ children }: { children: ReactNode }) {
+  const [overlayPosition, setOverlayPosition] = useState<OverlayPosition>({
+    x: document.documentElement.clientWidth / 2,
+    y: document.documentElement.clientHeight,
+  });
   const [duration, setDuration] = useState(25);
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
@@ -160,6 +179,8 @@ export function TimerProvider({ children }: { children: ReactNode }) {
   return (
     <TimerContext.Provider
       value={{
+        overlayPosition,
+        setOverlayPosition,
         duration,
         timeLeft,
         isActive,

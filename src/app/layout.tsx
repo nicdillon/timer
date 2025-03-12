@@ -4,7 +4,6 @@ import { UserProvider } from '@auth0/nextjs-auth0/client';
 import './globals.css';
 import Link from 'next/link';
 import { ReactNode, useState } from 'react';
-import { TimerProvider } from './TimerContext';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -28,6 +27,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const TimerProvider = dynamic(() => import('./TimerContext'), {ssr: false})
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);

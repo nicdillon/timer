@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Tooltip from '@mui/material/Tooltip';
-import { useTimer } from './TimerContext';
+import { useTimer } from './TimerContext'; // adjust if needed
+import { useTimerContext } from './TimerContext';
 import { usePathname } from 'next/navigation';
 
 export default function TimerOverlay() {
@@ -21,14 +22,15 @@ export default function TimerOverlay() {
         handleCategoryChange,
         formatTime,
     } = useTimer();
+
+    const { overlayPosition, setOverlayPosition } = useTimerContext();
+
     const [overlaySize, setOverlaySize] = useState({ width: 200, height: 200 });
-    const [currentPosition, setCurrentPosition] = useState({ x: (document!.documentElement.clientWidth - overlaySize.width) / 2, y: document!.documentElement.clientHeight });
+    const [currentPosition, setCurrentPosition] = useState({ x: overlayPosition.x, y: overlayPosition.y });
 
     const pathname = usePathname();
     const isRoot = pathname === '/';
 
-    // Compute an overlay size that is mobile friendly:
-    // On small screens (<600px) use 90% of the viewport width and a slightly smaller height.
     const computeOverlaySize = () => {
         const width = document.documentElement.clientWidth < 600 ? document.documentElement.clientWidth * 0.9 : 300;
         const height = document.documentElement.clientWidth < 600 ? 150 : 150;
@@ -44,18 +46,17 @@ export default function TimerOverlay() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Compute target position for the overlay so that:
-    // - On the root page, it appears centered (accounting for overlay size)
-    // - On other pages, it stays near the bottom-right (with a small margin)
     const computeTargetPosition = () => {
         if (isRoot) {
             return {
-                x: (document!.documentElement.clientWidth - overlaySize.width) / 2,
-                y: (document!.documentElement.clientHeight - overlaySize.height) / 2,
+                x: (document.documentElement.clientWidth - overlaySize.width) / 2,
+                y: (document.documentElement.clientHeight - overlaySize.height) / 2,
             };
         } else {
             return {
-                x: (document!.documentElement.clientWidth < 600 ? (document.documentElement.clientWidth - overlaySize.width) / 2 : (document.documentElement.clientWidth - overlaySize.width - 10)),
+                x: document.documentElement.clientWidth < 600
+                    ? (document.documentElement.clientWidth - overlaySize.width) / 2
+                    : (document.documentElement.clientWidth - overlaySize.width - 10),
                 y: 10,
             };
         }
@@ -71,8 +72,12 @@ export default function TimerOverlay() {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed z-45"
             style={{ width: overlaySize.width, height: overlaySize.height }}
-            onAnimationComplete={() => setCurrentPosition(targetPosition)}
+            onAnimationComplete={() => {
+                setCurrentPosition(targetPosition);
+                setOverlayPosition(targetPosition);
+            }}
         >
+            {/* Overlay content here */}
             <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center h-full justify-center">
                     <div className="mb-2">
@@ -103,12 +108,6 @@ export default function TimerOverlay() {
                             </Tooltip>
                         )}
                     </div>
-                    {isRoot && (
-                        // add additional timer controls when on the root page
-                        <div>
-
-                        </div>
-                    )}
                     <div className="flex gap-1">
                         {!isActive && (
                             <button onClick={handleStart} className="px-2 py-1 bg-purple-500 text-white rounded text-md">
