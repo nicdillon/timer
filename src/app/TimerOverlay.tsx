@@ -21,6 +21,8 @@ export default function TimerOverlay() {
         handleCategoryChange,
         formatTime,
     } = useTimer();
+    const [overlaySize, setOverlaySize] = useState({ width: 200, height: 200 });
+    const [currentPosition, setCurrentPosition] = useState({ x: (document!.documentElement.clientWidth - overlaySize.width) / 2, y: document!.documentElement.clientHeight });
 
     const pathname = usePathname();
     const isRoot = pathname === '/';
@@ -32,8 +34,6 @@ export default function TimerOverlay() {
         const height = document.documentElement.clientWidth < 600 ? 150 : 150;
         return { width, height };
     };
-
-    const [overlaySize, setOverlaySize] = useState({ width: 200, height: 200 });
 
     useEffect(() => {
         const handleResize = () => {
@@ -62,17 +62,16 @@ export default function TimerOverlay() {
     };
 
     const targetPosition = computeTargetPosition();
-    // Initial position: start below the screen (y value is set to document.documentElement.clientHeight)
-    const initialPosition = { x: targetPosition.x, y: document.documentElement.clientHeight };
 
     return (
         <motion.div
             layout
-            initial={initialPosition}
+            initial={currentPosition}
             animate={targetPosition}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed z-45"
             style={{ width: overlaySize.width, height: overlaySize.height }}
+            onAnimationComplete={() => setCurrentPosition(targetPosition)}
         >
             <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center h-full justify-center">
@@ -107,7 +106,7 @@ export default function TimerOverlay() {
                     {isRoot && (
                         // add additional timer controls when on the root page
                         <div>
-                            
+
                         </div>
                     )}
                     <div className="flex gap-1">
