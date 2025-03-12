@@ -8,6 +8,12 @@ import { useTimerContext } from './TimerContext';
 import { usePathname } from 'next/navigation';
 
 export default function TimerOverlay() {
+    // This state ensures we only render on the client.
+    const [hasMounted, setHasMounted] = useState(false);
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
     const {
         duration,
         timeLeft,
@@ -32,9 +38,14 @@ export default function TimerOverlay() {
     const isRoot = pathname === '/';
 
     const computeOverlaySize = () => {
-        const width = document.documentElement.clientWidth < 600 ? document.documentElement.clientWidth * 0.9 : 300;
-        const height = document.documentElement.clientWidth < 600 ? 150 : 150;
-        return { width, height };
+        if (typeof window !== 'undefined') {
+            const width = document.documentElement.clientWidth < 600 ? document.documentElement.clientWidth * 0.9 : 300;
+            const height = document.documentElement.clientWidth < 600 ? 150 : 150;
+            return { width, height };
+        }
+        else {
+            return {width: 0, height: 0};
+        }
     };
 
     useEffect(() => {
@@ -45,6 +56,9 @@ export default function TimerOverlay() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // Until we've mounted, render nothing (or a placeholder)
+    if (!hasMounted) return null;
 
     const computeTargetPosition = () => {
         if (isRoot) {
@@ -67,7 +81,7 @@ export default function TimerOverlay() {
     return (
         <motion.div
             layout
-            initial={{x: overlayPosition.x, y: overlayPosition.y}}
+            initial={{ x: overlayPosition.x, y: overlayPosition.y }}
             animate={targetPosition}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed z-45"
@@ -75,7 +89,7 @@ export default function TimerOverlay() {
             onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
             {/* Overlay content here */}
-            <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
+            <div className="bg-white bg-opacity-50 rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center h-full justify-center">
                     <div className="mb-2">
                         {isActive ? (

@@ -52,12 +52,21 @@ export function useTimerContext() {
 }
 
 export default function TimerProvider({ children }: { children: ReactNode }) {
+  // This state ensures we only render on the client.
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+  
   const [overlayPosition, setOverlayPosition] = useState<OverlayPosition>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('overlayPosition');
       if (saved) {
         return JSON.parse(saved);
       }
+    }
+    else {
+      return {x: 0, y: 0};
     }
     return {
       x: document.documentElement.clientWidth / 2,
@@ -196,6 +205,9 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
       console.error('Error saving focus session:', err);
     }
   };
+
+  // Until we've mounted, render nothing (or a placeholder)
+  if (!hasMounted) return null;
 
   return (
     <TimerContext.Provider

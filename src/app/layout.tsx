@@ -10,24 +10,22 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import TimerIcon from '@mui/icons-material/Timer';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import dynamic from 'next/dynamic';
+import TimerProvider from './TimerContext';
+import TimerOverlay from './TimerOverlay';
 
 function LayoutContent({ children }: { children: ReactNode }) {
   // Now always include TimerOverlay so it can animate between positions.
 
-  const TimerOverlayNoSSR = dynamic(() => import('./TimerOverlay'), {ssr: false})
-
   return (
     <div className='flex flex-col md:flex-row'>
       <main className="flex-grow md:ml-1/4">{children}</main>
-      <TimerOverlayNoSSR />
+      <TimerOverlay />
     </div>
   );
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const TimerProvider = dynamic(() => import('./TimerContext'), {ssr: false})
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
