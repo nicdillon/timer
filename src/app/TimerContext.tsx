@@ -52,9 +52,17 @@ export function useTimerContext() {
 }
 
 export default function TimerProvider({ children }: { children: ReactNode }) {
-  const [overlayPosition, setOverlayPosition] = useState<OverlayPosition>({
-    x: document.documentElement.clientWidth / 2,
-    y: document.documentElement.clientHeight,
+  const [overlayPosition, setOverlayPosition] = useState<OverlayPosition>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('overlayPosition');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    }
+    return {
+      x: document.documentElement.clientWidth / 2,
+      y: document.documentElement.clientHeight,
+    };
   });
   const [duration, setDuration] = useState(25);
   const [timeLeft, setTimeLeft] = useState(25 * 60);
@@ -63,6 +71,19 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   const [category, setCategory] = useState('Category');
   const hasFinished = useRef(false);
   const { user, isLoading, error } = useUser();
+
+  // Load saved overlayPosition from localStorage on mount.
+  useEffect(() => {
+    const savedOverlayPosition = localStorage.getItem('overlayPosition');
+    if (savedOverlayPosition) {
+      setOverlayPosition(JSON.parse(savedOverlayPosition));
+    }
+  }, []);
+
+  // Persist overlayPosition changes to localStorage.
+  useEffect(() => {
+    localStorage.setItem('overlayPosition', JSON.stringify(overlayPosition));
+  }, [overlayPosition]);
 
   // Load saved state from localStorage on mount
   useEffect(() => {
@@ -106,7 +127,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     return () => {
       if (interval) clearInterval(interval);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, isPaused]);
 
   const handleStart = () => {

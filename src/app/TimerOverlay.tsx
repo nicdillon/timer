@@ -26,7 +26,7 @@ export default function TimerOverlay() {
     const { overlayPosition, setOverlayPosition } = useTimerContext();
 
     const [overlaySize, setOverlaySize] = useState({ width: 200, height: 200 });
-    const [currentPosition, setCurrentPosition] = useState({ x: overlayPosition.x, y: overlayPosition.y });
+    // const [currentPosition, setCurrentPosition] = useState({ x: overlayPosition.x, y: overlayPosition.y });
 
     const pathname = usePathname();
     const isRoot = pathname === '/';
@@ -67,15 +67,12 @@ export default function TimerOverlay() {
     return (
         <motion.div
             layout
-            initial={currentPosition}
+            initial={{x: overlayPosition.x, y: overlayPosition.y}}
             animate={targetPosition}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed z-45"
             style={{ width: overlaySize.width, height: overlaySize.height }}
-            onAnimationComplete={() => {
-                setCurrentPosition(targetPosition);
-                setOverlayPosition(targetPosition);
-            }}
+            onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
             {/* Overlay content here */}
             <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
