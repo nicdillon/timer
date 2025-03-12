@@ -15,13 +15,13 @@ export default function ProfileClient() {
       {user && (
         <div className="p-10 text-center flex flex-col justify-center w-auto min-w-1/2 items-center bg-white bg-opacity-90 rounded-lg shadow-lg text-2xl h-auto text-black gap-4">
           <h1 className="text-4xl">Welcome, {user.nickname ?? user.name}!</h1>
-          <Link className="block text-purple-500 hover:text-purple-700  rounded px-4 py-2 text-center " href="/api/auth/logout">Logout</Link>
+          <Link prefetch={false} className="block text-purple-500 hover:text-purple-700  rounded px-4 py-2 text-center " href="/api/auth/logout">Logout</Link>
         </div>
       )}
       {!user && (
         <div className="p-10 m-10 text-center flex flex-col justify-center w-auto max-w-1/2 items-center bg-white bg-opacity-90 rounded-lg shadow-lg text-2xl h-auto text-black gap-4">
           <h3>TIMER&apos;s best experience is reserved for authenticated users.</h3>
-          <Link className="w-auto text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg" href="/api/auth/login">Login</Link>
+          <Link prefetch={false} className="w-auto text-purple-500 hover:text-purple-700 border border-purple-500 rounded px-4 py-2 text-center bg-white bg-opacity-30 backdrop-blur-md shadow-lg" href="/api/auth/login">Login</Link>
         </div>)}
     </div>
   );
