@@ -12,16 +12,8 @@ import {
   Paper,
   CircularProgress,
 } from '@mui/material';
-import { PieChart } from '@mui/x-charts/PieChart';
-
-// Define the TypeScript interface for a focus session record.
-interface FocusSession {
-  id?: number;
-  user_id: string;
-  category: string;
-  duration: number;
-  start_time: string;
-}
+import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
+import { FocusSession } from '../api/sessions/route';
 
 export default function AnalyticsPage() {
   const [sessions, setSessions] = useState<FocusSession[]>([]);
@@ -83,7 +75,7 @@ export default function AnalyticsPage() {
 
   if (isLoading)
     return (
-      <div className="flex flex-col items-center justify-center h-screen w-screen bg-gradient-to-r from-purple-400 via-pink-400 to-red-400">
+      <div className="flex flex-col items-center justify-center h-screen w-screen">
         <h1 className="text-3xl font-bold mb-4 text-white">Your Focus Sessions</h1>
         <CircularProgress color="inherit" />
         <p className="text-lg text-white mt-4">Loading...</p>
@@ -161,13 +153,26 @@ export default function AnalyticsPage() {
                   outerRadius: 100,
                   paddingAngle: 5,
                   cornerRadius: 5,
-                  arcLabel: (item) => `${item.label}: ${item.value}`,
-                  arcLabelMinAngle: 30,
+                  // arcLabel: (item) => `${item.label}: ${item.value}`,
+                  // arcLabelMinAngle: 30,
                 },
               ]}
-              colors={['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']}
+              slotProps={{
+                legend: {
+                  direction: 'column',
+                  position: { vertical: 'middle', horizontal: 'right' },
+                  padding: 0,
+                  itemGap: 2,
+                },
+              }}
+              colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
               width={chartWidth}
               height={200}
+              sx={{[`& .${pieArcLabelClasses.root}`]: {
+                fontWeight: '',
+                color: 'white',
+                fill: 'white'
+              }}}
             />
           </Paper>
           <Paper className="p-3">
@@ -180,13 +185,25 @@ export default function AnalyticsPage() {
                   outerRadius: 100,
                   paddingAngle: 5,
                   cornerRadius: 5,
-                  arcLabel: (item) => `${item.label}: ${item.value}`,
-                  arcLabelMinAngle: 30,
+                  // arcLabel: (item) => `${item.label}: ${item.value}`,
+                  // arcLabelMinAngle: 30,
                 },
               ]}
-              colors={['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']}
+              slotProps={{
+                legend: {
+                  direction: 'column',
+                  position: { vertical: 'middle', horizontal: 'right' },
+                  padding: 0,
+                },
+              }}
+              colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
               width={chartWidth}
               height={200}
+              sx={{[`& .${pieArcLabelClasses.root}`]: {
+                fontWeight: '',
+                color: 'white',
+                fill: 'white'
+              }}}
             />
           </Paper>
           <Paper className="p-3">
@@ -199,11 +216,23 @@ export default function AnalyticsPage() {
                   outerRadius: 100,
                   paddingAngle: 5,
                   cornerRadius: 5,
-                  arcLabel: (item) => `${item.label}: ${item.value}`,
-                  arcLabelMinAngle: 30,
+                  // arcLabel: (item) => `${item.label}: ${item.value}`,
+                  // arcLabelMinAngle: 35,
                 },
               ]}
-              colors={['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']}
+              slotProps={{
+                legend: {
+                  direction: 'column',
+                  position: { vertical: 'middle', horizontal: 'right' },
+                  padding: 0,
+                },
+              }}
+              sx={{[`& .${pieArcLabelClasses.root}`]: {
+                fontWeight: '',
+                color: 'white',
+                fill: 'white'
+              }}}
+              colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
               width={chartWidth}
               height={200}
             />
@@ -216,14 +245,14 @@ export default function AnalyticsPage() {
       {/* The table displaying individual focus sessions */}
       {sessions && sessions.length > 0 && !isTableExpanded && (
         <div>
-          <button onClick={handleExpandTable} className="bg-purple-500 text-white px-4 py-2 rounded">
+          <button onClick={handleExpandTable} className="bg-cyan-500 text-white px-4 py-2 rounded">
             Show All Focus Sessions
           </button>
         </div>
       )}
       {sessions && sessions.length > 0 && isTableExpanded && (
         <div className="flex flex-col width-full gap-2 justify-center items-center">
-          <button onClick={handleExpandTable} className="bg-purple-500 text-white px-4 py-2 rounded w-auto">
+          <button onClick={handleExpandTable} className="bg-cyan-500 text-white px-4 py-2 rounded w-auto">
             Hide All Focus Sessions
           </button>
           <Paper className="shadow-lg" sx={{ width: '100%', overflow: 'hidden' }}>
@@ -238,7 +267,7 @@ export default function AnalyticsPage() {
                 </TableHead>
                 <TableBody>
                   {sessions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((session: FocusSession) => (
-                    <TableRow hover key={session.id ?? session.start_time}>
+                    <TableRow hover key={session.id}>
                       <TableCell>{session.category}</TableCell>
                       <TableCell>{session.duration}</TableCell>
                       <TableCell>{new Date(session.start_time).toLocaleString()}</TableCell>

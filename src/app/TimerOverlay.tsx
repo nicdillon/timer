@@ -26,6 +26,7 @@ export default function TimerOverlay() {
         handleStop,
         handleDurationChange,
         handleCategoryChange,
+        handleTest,
         formatTime,
     } = useTimer();
 
@@ -89,11 +90,11 @@ export default function TimerOverlay() {
             onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
             {/* Overlay content here */}
-            <div className="bg-white bg-opacity-50 rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
+            <div className="bg-white bg-opacity-30 rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center h-full justify-center">
                     <div className="mb-2">
                         {isActive ? (
-                            <span className="text-2xl font-bold text-black">{formatTime(timeLeft)}</span>
+                            <span className="text-2xl font-bold text-white">{formatTime(timeLeft)}</span>
                         ) : (
                             <Tooltip title="Enter a category" arrow>
                                 <input
@@ -101,7 +102,7 @@ export default function TimerOverlay() {
                                     value={category}
                                     onChange={handleCategoryChange}
                                     placeholder="Category"
-                                    className="text-black text-lg p-1 border border-purple-500 rounded w-auto bg-transparent text-center focus:outline-none focus:border-purple-700"
+                                    className="text-white text-lg p-1 border border-cyan-700 rounded w-auto bg-transparent text-center focus:outline-none focus:border-cyan-700"
                                 />
                             </Tooltip>
                         )}
@@ -113,15 +114,22 @@ export default function TimerOverlay() {
                                     type="number"
                                     value={duration}
                                     onChange={handleDurationChange}
-                                    className="text-black text-lg text-center border border-purple-500 rounded focus:outline-none bg-transparent bg-opacity-30 appearance-none focus:border-purple-700"
+                                    className="text-black text-lg text-center border border-cyan-700 rounded focus:outline-none bg-transparent bg-opacity-30 appearance-none focus:border-cyan-700"
                                     min="1"
                                 />
                             </Tooltip>
                         )}
                     </div>
+                    {/* Button to test session save with test data */}
+                    {/* <button
+                        onClick={handleTest}
+                        className="px-2 py-1 bg-cyan-700 text-white rounded text-md"
+                    >
+                        Test
+                    </button> */}
                     <div className="flex gap-1">
                         {!isActive && (
-                            <button onClick={handleStart} className="px-2 py-1 bg-purple-500 text-white rounded text-md">
+                            <button onClick={handleStart} className="px-2 py-1 bg-cyan-700 text-white rounded text-md">
                                 Start
                             </button>
                         )}

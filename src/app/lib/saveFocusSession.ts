@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { createClient } from './supabaseServer';
 
 export interface FocusSession {
   user_id: string;     // The authenticated user's ID
@@ -12,8 +12,10 @@ export interface FocusSession {
  * @param session - The focus session data.
  * @returns The inserted data if successful, or null if an error occurred.
  */
-export async function saveFocusSession(session: FocusSession): Promise<void> {
+export async function POST(session: FocusSession): Promise<void> {
   try {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
       .from('focus_sessions')
       .insert({

@@ -16,6 +16,7 @@
     "@mui/material": "^6.4.7",
     "@mui/x-charts": "^7.27.1",
     "@prisma/client": "^6.4.1",
+    "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.1",
     "chart.js": "^4.4.8",
     "framer-motion": "^12.4.13",
