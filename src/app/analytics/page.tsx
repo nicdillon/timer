@@ -12,22 +12,27 @@ import {
   Paper,
   CircularProgress,
 } from '@mui/material';
-import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
-import { FocusSession } from '../api/sessions/route';
+import { PieChart, pieArcLabelClasses, pieArcClasses } from '@mui/x-charts/PieChart';
+import { BarChart, barLabelClasses } from '@mui/x-charts/BarChart';
+import { FocusSession } from '../lib/dataTypes';
+import { aggregateByCategory, aggregateByDay, aggregateByDuration, aggregateLast7Days } from '../lib/aggregateStatistics';
 
 export default function AnalyticsPage() {
   const [sessions, setSessions] = useState<FocusSession[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isTableExpanded, setIsTableExpanded] = useState<boolean>(false);
+  const dataByCategory = aggregateByCategory(sessions);
+  const dataByDay = aggregateByDay(sessions);
+  const dataByDuration = aggregateByDuration(sessions);
+  const dataLast7Days = aggregateLast7Days(sessions);
 
   // Pagination state.
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // New state for responsive chart width
+  // Responsive chart width.
   const [chartWidth, setChartWidth] = useState(400);
-
   useEffect(() => {
     async function fetchSessions() {
       try {
@@ -54,11 +59,9 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     const updateChartWidth = () => {
-      // Use 90% of the window width (minus 40px for padding) on small screens
       const newWidth = window.innerWidth < 600 ? window.innerWidth - 40 : 400;
       setChartWidth(newWidth);
     };
-
     updateChartWidth();
     window.addEventListener('resize', updateChartWidth);
     return () => window.removeEventListener('resize', updateChartWidth);
@@ -72,6 +75,10 @@ export default function AnalyticsPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  function handleExpandTable(): void {
+    setIsTableExpanded(prev => !prev);
+  }
 
   if (isLoading)
     return (
@@ -90,60 +97,13 @@ export default function AnalyticsPage() {
       </div>
     );
 
-  // Aggregate data for the charts
-
-  // Focus time by category
-  const aggregatedByCategory = sessions.reduce((acc, session) => {
-    acc[session.category] = (acc[session.category] || 0) + session.duration;
-    return acc;
-  }, {} as Record<string, number>);
-  const dataByCategory = Object.entries(aggregatedByCategory).map(([label, value], index) => ({
-    id: index,
-    label,
-    value,
-  }));
-
-  // Focus time by day of week
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const aggregatedByDay = sessions.reduce((acc, session) => {
-    const day = days[new Date(session.start_time).getDay()];
-    acc[day] = (acc[day] || 0) + session.duration;
-    return acc;
-  }, {} as Record<string, number>);
-  const dataByDay = Object.entries(aggregatedByDay).map(([label, value], index) => ({
-    id: index,
-    label,
-    value,
-  }));
-
-  // Focus time by duration bins:
-  // Bins defined as: "Short (<30)", "Medium (30-60)", "Long (>60)"
-  const aggregatedByDuration = sessions.reduce((acc, session) => {
-    let bin = '';
-    if (session.duration < 30) bin = 'Short (<30)';
-    else if (session.duration < 60) bin = 'Medium (30-60)';
-    else bin = 'Long (>60)';
-    acc[bin] = (acc[bin] || 0) + session.duration;
-    return acc;
-  }, {} as Record<string, number>);
-  const dataByDuration = Object.entries(aggregatedByDuration).map(([label, value], index) => ({
-    id: index,
-    label,
-    value,
-  }));
-
-  function handleExpandTable(): void {
-    setIsTableExpanded((prev) => !prev);
-  }
-
   return (
     <div className="p-4 pt-20 flex flex-col items-center justify-center min-h-screen w-auto max-w-screen">
       <h1 className="text-3xl font-bold mb-4">Your Focus Sessions</h1>
-
       {/* Charts section */}
       {sessions && sessions.length > 0 ? (
         <div className="flex flex-wrap justify-center gap-5 mb-5">
-          <Paper className="p-3">
+          <Paper className="p-3 bg-none">
             <h2 className="text-xl text-center mb-2">Total Focus Time by Category</h2>
             <PieChart
               series={[
@@ -151,10 +111,8 @@ export default function AnalyticsPage() {
                   data: dataByCategory,
                   innerRadius: 30,
                   outerRadius: 100,
-                  paddingAngle: 5,
+                  paddingAngle: 2,
                   cornerRadius: 5,
-                  // arcLabel: (item) => `${item.label}: ${item.value}`,
-                  // arcLabelMinAngle: 30,
                 },
               ]}
               slotProps={{
@@ -168,11 +126,10 @@ export default function AnalyticsPage() {
               colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
               width={chartWidth}
               height={200}
-              sx={{[`& .${pieArcLabelClasses.root}`]: {
-                fontWeight: '',
-                color: 'white',
-                fill: 'white'
-              }}}
+              sx={{
+                [`& .${pieArcLabelClasses.root}`]: { color: 'black', fill: 'white' },
+                [`& .${pieArcClasses.root}`]: { stroke: 'none' },
+              }}
             />
           </Paper>
           <Paper className="p-3">
@@ -183,27 +140,20 @@ export default function AnalyticsPage() {
                   data: dataByDay,
                   innerRadius: 30,
                   outerRadius: 100,
-                  paddingAngle: 5,
+                  paddingAngle: 2,
                   cornerRadius: 5,
-                  // arcLabel: (item) => `${item.label}: ${item.value}`,
-                  // arcLabelMinAngle: 30,
                 },
               ]}
               slotProps={{
-                legend: {
-                  direction: 'column',
-                  position: { vertical: 'middle', horizontal: 'right' },
-                  padding: 0,
-                },
+                legend: { direction: 'column', position: { vertical: 'middle', horizontal: 'right' }, padding: 0 },
               }}
               colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
               width={chartWidth}
               height={200}
-              sx={{[`& .${pieArcLabelClasses.root}`]: {
-                fontWeight: '',
-                color: 'white',
-                fill: 'white'
-              }}}
+              sx={{
+                [`& .${pieArcLabelClasses.root}`]: { color: 'white', fill: 'white' },
+                [`& .${pieArcClasses.root}`]: { stroke: 'none' },
+              }}
             />
           </Paper>
           <Paper className="p-3">
@@ -216,32 +166,41 @@ export default function AnalyticsPage() {
                   outerRadius: 100,
                   paddingAngle: 5,
                   cornerRadius: 5,
-                  // arcLabel: (item) => `${item.label}: ${item.value}`,
-                  // arcLabelMinAngle: 35,
                 },
               ]}
               slotProps={{
-                legend: {
-                  direction: 'column',
-                  position: { vertical: 'middle', horizontal: 'right' },
-                  padding: 0,
-                },
+                legend: { direction: 'column', position: { vertical: 'middle', horizontal: 'right' }, padding: 0 },
               }}
-              sx={{[`& .${pieArcLabelClasses.root}`]: {
-                fontWeight: '',
-                color: 'white',
-                fill: 'white'
-              }}}
               colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
               width={chartWidth}
               height={200}
+              sx={{
+                [`& .${pieArcLabelClasses.root}`]: { color: 'white', fill: 'white' },
+                [`& .${pieArcClasses.root}`]: { stroke: 'none' },
+              }}
+            />
+          </Paper>
+          {/* New MUI Sparkline Chart for Last 7 Days */}
+          <Paper className="p-3">
+            <h2 className="text-xl text-center mb-2">Focus Time Over Last 7 Days</h2>
+            <BarChart
+              dataset={dataLast7Days}
+              series={[
+                {
+                  data: dataLast7Days.map((item) => item.value),
+                },
+              ]}
+              xAxis={[{ scaleType: 'band', dataKey: 'date'}]}
+              width={chartWidth}
+              colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
+              height={200}
+              sx={{[`& .${barLabelClasses.root}`]: { color: 'black', fill: 'black' },}}
             />
           </Paper>
         </div>
       ) : (
         <p className="text-lg text-gray-700">No focus sessions found.</p>
       )}
-
       {/* The table displaying individual focus sessions */}
       {sessions && sessions.length > 0 && !isTableExpanded && (
         <div>
@@ -252,11 +211,11 @@ export default function AnalyticsPage() {
       )}
       {sessions && sessions.length > 0 && isTableExpanded && (
         <div className="flex flex-col width-full gap-2 justify-center items-center">
-          <button onClick={handleExpandTable} className="bg-cyan-500 text-white px-4 py-2 rounded w-auto">
+          <button onClick={handleExpandTable} className="border-2 border-cyan-700 bg-gray-700 bg-opacity-30 text-white px-4 py-2 rounded w-auto shadow-lg">
             Hide All Focus Sessions
           </button>
           <Paper className="shadow-lg" sx={{ width: '100%', overflow: 'hidden' }}>
-            <TableContainer className="bg-white bg-opacity-30 backdrop-blur-md  w-full">
+            <TableContainer className="bg-white bg-opacity-30 backdrop-blur-md w-full">
               <Table stickyHeader aria-label="focus sessions table">
                 <TableHead>
                   <TableRow>

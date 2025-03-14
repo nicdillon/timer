@@ -9,7 +9,7 @@ import React, {
   ReactNode
 } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { FocusSession } from './api/sessions/route';
+import { FocusSession } from './lib/dataTypes';
 
 interface TimerContextProps {
   overlayPosition: OverlayPosition;
@@ -23,7 +23,7 @@ interface TimerContextProps {
   handlePause: () => void;
   handleResume: () => void;
   handleStop: () => void;
-  handleTest: () => void;
+  // handleTest: () => void;
   handleDurationChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleCategoryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   formatTime: (seconds: number) => string;
@@ -140,21 +140,21 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, isPaused]);
 
-  const handleTest = () => {
-    console.log('Test');
-    // Set a very short duration for testing (duration in minutes)
-    // Here we set duration to a fraction (e.g. 0.1 minute = 6 seconds), and force time left to 1 second for rapid testing.
-    setDuration(0.1);
-    setTimeLeft(1);
-    setIsActive(true);
-    setIsPaused(false);
-    hasFinished.current = false;
+  // const handleTest = () => {
+  //   console.log('Test');
+  //   // Set a very short duration for testing (duration in minutes)
+  //   // Here we set duration to a fraction (e.g. 0.1 minute = 6 seconds), and force time left to 1 second for rapid testing.
+  //   setDuration(0.1);
+  //   setTimeLeft(1);
+  //   setIsActive(true);
+  //   setIsPaused(false);
+  //   hasFinished.current = false;
   
-    // After a short delay, trigger the timer finish logic
-    setTimeout(() => {
-      handleTimerFinish();
-    }, 100); // 100ms delay
-  };
+  //   // After a short delay, trigger the timer finish logic
+  //   setTimeout(() => {
+  //     handleTimerFinish();
+  //   }, 100); // 100ms delay
+  // };
 
   const handleStart = () => {
     setIsActive(true);
@@ -177,6 +177,11 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   };
 
   const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value === '') {
+      setDuration(0);
+      setTimeLeft(0);
+      return;
+    }
     const newDuration = parseInt(e.target.value);
     setDuration(newDuration);
     setTimeLeft(newDuration * 60);
@@ -266,7 +271,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
         handleDurationChange,
         handleCategoryChange,
         formatTime,
-        handleTest,
+        // handleTest,
       }}
     >
       {children}

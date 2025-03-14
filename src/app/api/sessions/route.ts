@@ -1,14 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { createClient } from '../../lib/supabaseServer';
+import { FocusSession } from '../../lib/dataTypes';
 
-export interface FocusSession {
-  id: number | null;
-  user_id: string;     // The authenticated user's ID
-  category: string;    // The focus session's category
-  duration: number;    // Duration of the session (in seconds or minutes)
-  start_time: Date;    // Timestamp when the session started
-}
+
 
 export async function GET() {
   // Retrieve the session on the server.

@@ -5,12 +5,15 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Should be transparent with 30 opacity */
+  --paper-background: rgba(255, 255, 255, 0.3);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --paper-background: rgba(255, 255, 255, 0.5);
   }
 }
 
