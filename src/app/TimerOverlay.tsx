@@ -121,10 +121,8 @@ export default function TimerOverlay() {
     // E.g. for a 15 minute (900 sec) timer, progress = 900/3600 = 0.25.
     function AnalogClock({
         timeLeft,
-        duration,
     }: {
         timeLeft: number;
-        duration: number;
     }) {
         const oneHour = 3600;
         const progress = timeLeft / oneHour;
@@ -218,7 +216,7 @@ export default function TimerOverlay() {
                                 <DigitalClock timeLeft={timeLeft} />
                             ) : (
                                 <div className='flex flex-col justify-center items-center w-1/2'>
-                                    <AnalogClock timeLeft={timeLeft} duration={duration} />
+                                    <AnalogClock timeLeft={timeLeft} />
                                 </div>
                             )
                         ) : (
@@ -227,7 +225,7 @@ export default function TimerOverlay() {
                                 <DigitalClock timeLeft={timeLeft} />
                             ) : (
                                 <div className='flex flex-col justify-center items-center w-1/2'>
-                                    <AnalogClock timeLeft={timeLeft} duration={duration} />
+                                    <AnalogClock timeLeft={timeLeft} />
                                 </div>
                             )
                         )}

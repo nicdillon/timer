@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { usePathname } from 'next/navigation'
 import { ReactNode, useState } from 'react';
-import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
+// import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import TimerIcon from '@mui/icons-material/Timer';
