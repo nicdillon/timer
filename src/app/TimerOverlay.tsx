@@ -13,11 +13,20 @@ import { useTimerContext } from "./TimerContext";
 import { usePathname } from "next/navigation";
 
 export default function TimerOverlay() {
-    // This state ensures we only render on the client.
     const [hasMounted, setHasMounted] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(false);
+    const pathname = usePathname();
+
     useEffect(() => {
         setHasMounted(true);
     }, []);
+
+    useEffect(() => {
+        // Maximize when navigating to /timer
+        if (pathname === '/timer') {
+            setIsMinimized(false);
+        }
+    }, [pathname]);
 
     // Get timer data and functions from context.
     const {
@@ -44,9 +53,12 @@ export default function TimerOverlay() {
     // Compute responsive overlay size based on viewport and current page.
     const computeOverlaySize = () => {
         if (typeof window !== "undefined") {
+            if (isMinimized) {
+                return { width: 60, height: 60 };
+            }
+
             let width: number, height: number;
             if (isTimerPage) {
-                // On the root page, use more aggressive sizing.
                 width =
                     document.documentElement.clientWidth < 600
                         ? document.documentElement.clientWidth * 0.9
@@ -56,7 +68,6 @@ export default function TimerOverlay() {
                         ? document.documentElement.clientHeight * 0.5
                         : 400;
             } else {
-                // On other pages, keep the overlay a bit smaller.
                 width =
                     document.documentElement.clientWidth < 600
                         ? document.documentElement.clientWidth * 0.7
@@ -219,7 +230,31 @@ export default function TimerOverlay() {
             style={{ width: overlaySize.width, height: overlaySize.height }}
             onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
-            <div className="bg-[var(--paper-background)] rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
+            <div 
+                className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? 'p-0' : 'p-2'} h-full flex flex-col items-center justify-center cursor-pointer`}
+                onClick={() => isMinimized && setIsMinimized(false)}
+            >
+                {!isMinimized && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsMinimized(true);
+                        }}
+                        className="absolute top-2 right-2 text-[var(--accent)] hover:text-[var(--accent-dark)]"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                )}
+                {isMinimized ? (
+                    <div className="w-full h-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                            <path strokeLinecap="round" strokeWidth={2} d="M12 6v6l4 2" />
+                        </svg>
+                    </div>
+                ) : (
                 <div className="flex flex-col items-center h-full w-full justify-center">
                     {/* Clock Display (digital or analogue) */}
                     <div className="mb-2 w-full flex flex-col items-center justify-center">
@@ -329,6 +364,7 @@ export default function TimerOverlay() {
                         )}
                     </div>
                 </div>
+                )}
             </div>
         </motion.div>
     );
