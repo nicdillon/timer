@@ -51,35 +51,10 @@ export default function TimerOverlay() {
 
     // Compute responsive overlay size based on viewport and current page.
     const computeOverlaySize = () => {
-        if (typeof window !== "undefined") {
-            if (isMinimized) {
-                return { width: 60, height: 60 };
-            }
-
-            let width: number, height: number;
-            if (isTimerPage) {
-                width =
-                    document.documentElement.clientWidth < 600
-                        ? document.documentElement.clientWidth * 0.9
-                        : 400;
-                height =
-                    document.documentElement.clientHeight < 600
-                        ? document.documentElement.clientHeight * 0.5
-                        : 400;
-            } else {
-                width =
-                    document.documentElement.clientWidth < 600
-                        ? document.documentElement.clientWidth * 0.7
-                        : 250;
-                height =
-                    document.documentElement.clientHeight < 600
-                        ? document.documentElement.clientHeight * 0.3
-                        : 250;
-            }
-            return { width, height };
-        } else {
-            return { width: 0, height: 0 };
+        if (isMinimized) {
+            return { width: 60, height: 60 };
         }
+        return { width: "auto", height: "auto" };
     };
 
     useEffect(() => {
@@ -101,29 +76,13 @@ export default function TimerOverlay() {
     const computeTargetPosition = () => {
         if (isTimerPage) {
             return {
-                x:
-                    (document.documentElement.clientWidth - overlaySize.width) /
-                        2 -
-                    20,
-                y:
-                    (document.documentElement.clientHeight -
-                        overlaySize.height) /
-                    2,
+                x: '50%',
+                y: '50%'
             };
         } else {
             return {
-                x:
-                    document.documentElement.clientWidth < 600
-                        ? (document.documentElement.clientWidth -
-                              overlaySize.width) /
-                          2
-                        : document.documentElement.clientWidth -
-                          overlaySize.width -
-                          87,
-                y:
-                    document.documentElement.clientHeight -
-                    overlaySize.height -
-                    10,
+                x: 'calc(100vw - 2rem)',
+                y: 'calc(100vh - 2rem)'
             };
         }
     };
@@ -225,8 +184,12 @@ export default function TimerOverlay() {
             initial={{ x: overlayPosition.x, y: overlayPosition.y }}
             animate={targetPosition}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed z-45"
-            style={{ width: overlaySize.width, height: overlaySize.height }}
+            className={`fixed z-45 ${isTimerPage ? "transform -translate-x-1/2 -translate-y-1/2" : "transform translate-x-[-100%] translate-y-[-100%]"}`}
+            style={{ 
+                minWidth: isMinimized ? "60px" : "250px",
+                maxWidth: isTimerPage ? "90vw" : "400px",
+                maxHeight: isTimerPage ? "90vh" : "400px"
+            }}
             onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
             <div

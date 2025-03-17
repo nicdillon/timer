@@ -22,8 +22,8 @@ function LayoutContent({ children }: { children: ReactNode }) {
   // Now always include TimerOverlay so it can animate between positions.
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
-      <main className="flex-grow md:ml-1/4">{children}</main>
+    <div className="flex flex-col w-full">
+      <main className="md:ml-20 min-h-screen">{children}</main>
       <TimerOverlay />
     </div>
   );
