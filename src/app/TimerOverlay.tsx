@@ -23,7 +23,7 @@ export default function TimerOverlay() {
 
     useEffect(() => {
         // Maximize when navigating to /timer
-        if (pathname === '/timer') {
+        if (pathname === "/timer") {
             setIsMinimized(false);
         }
     }, [pathname]);
@@ -47,7 +47,6 @@ export default function TimerOverlay() {
     const { overlayPosition, setOverlayPosition } = useTimerContext();
     // Size state will be updated responsively.
     const [overlaySize, setOverlaySize] = useState({ width: 200, height: 200 });
-    const pathname = usePathname();
     const isTimerPage = pathname === "/timer";
 
     // Compute responsive overlay size based on viewport and current page.
@@ -230,8 +229,8 @@ export default function TimerOverlay() {
             style={{ width: overlaySize.width, height: overlaySize.height }}
             onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
-            <div 
-                className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? 'p-0' : 'p-2'} h-full flex flex-col items-center justify-center cursor-pointer`}
+            <div
+                className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-full flex flex-col items-center justify-center cursor-pointer`}
                 onClick={() => isMinimized && setIsMinimized(false)}
             >
                 {!isMinimized && (
@@ -242,128 +241,153 @@ export default function TimerOverlay() {
                         }}
                         className="absolute top-2 right-2 text-[var(--accent)] hover:text-[var(--accent-dark)]"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                            />
                         </svg>
                     </button>
                 )}
                 {isMinimized ? (
                     <div className="w-full h-full flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="32"
+                            height="32"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                        >
                             <circle cx="12" cy="12" r="10" strokeWidth={2} />
-                            <path strokeLinecap="round" strokeWidth={2} d="M12 6v6l4 2" />
+                            <path
+                                strokeLinecap="round"
+                                strokeWidth={2}
+                                d="M12 6v6l4 2"
+                            />
                         </svg>
                     </div>
                 ) : (
-                <div className="flex flex-col items-center h-full w-full justify-center">
-                    {/* Clock Display (digital or analogue) */}
-                    <div className="mb-2 w-full flex flex-col items-center justify-center">
-                        {isActive ? (
+                    <div className="flex flex-col items-center h-full w-full justify-center">
+                        {/* Clock Display (digital or analogue) */}
+                        <div className="mb-2 w-full flex flex-col items-center justify-center">
+                            {isActive ? (
+                                clockType === "digital" ? (
+                                    <DigitalClock timeLeft={timeLeft} />
+                                ) : (
+                                    <div className="flex flex-col justify-center items-center w-1/2">
+                                        <AnalogClock timeLeft={timeLeft} />
+                                    </div>
+                                )
+                            ) : // When timer is not active, show the digital clock as a preview.
                             clockType === "digital" ? (
                                 <DigitalClock timeLeft={timeLeft} />
                             ) : (
                                 <div className="flex flex-col justify-center items-center w-1/2">
                                     <AnalogClock timeLeft={timeLeft} />
                                 </div>
-                            )
-                        ) : // When timer is not active, show the digital clock as a preview.
-                        clockType === "digital" ? (
-                            <DigitalClock timeLeft={timeLeft} />
-                        ) : (
-                            <div className="flex flex-col justify-center items-center w-1/2">
-                                <AnalogClock timeLeft={timeLeft} />
+                            )}
+                            {/* Toggle Switch available always (both when active or setting timer) */}
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        color="default"
+                                        checked={clockType === "digital"}
+                                        onChange={() =>
+                                            setClockType((prev) =>
+                                                prev === "digital"
+                                                    ? "analog"
+                                                    : "digital",
+                                            )
+                                        }
+                                    />
+                                }
+                                label="Analog | Digital"
+                                className="mt-2"
+                            />
+                        </div>
+                        {/* Duration input for non-active timer */}
+                        {!isActive && (
+                            <div className="mb-2 w-1/2 flex flex-col items-center justify-center gap-4">
+                                <Tooltip title="Enter a category" arrow>
+                                    <input
+                                        type="text"
+                                        value={category}
+                                        onChange={handleCategoryChange}
+                                        placeholder="Category"
+                                        className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
+                                    />
+                                </Tooltip>
+                                <Tooltip title="Set duration" arrow>
+                                    <input
+                                        type="number"
+                                        value={duration === 0 ? "" : duration}
+                                        onChange={handleDurationChange}
+                                        className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
+                                        min="1"
+                                    />
+                                </Tooltip>
                             </div>
                         )}
-                        {/* Toggle Switch available always (both when active or setting timer) */}
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    color="default"
-                                    checked={clockType === "digital"}
-                                    onChange={() =>
-                                        setClockType((prev) =>
-                                            prev === "digital"
-                                                ? "analog"
-                                                : "digital",
-                                        )
-                                    }
-                                />
-                            }
-                            label="Analog | Digital"
-                            className="mt-2"
-                        />
-                    </div>
-                    {/* Duration input for non-active timer */}
-                    {!isActive && (
-                        <div className="mb-2 w-1/2 flex flex-col items-center justify-center gap-4">
-                            <Tooltip title="Enter a category" arrow>
-                                <input
-                                    type="text"
-                                    value={category}
-                                    onChange={handleCategoryChange}
-                                    placeholder="Category"
-                                    className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
-                                />
-                            </Tooltip>
-                            <Tooltip title="Set duration" arrow>
-                                <input
-                                    type="number"
-                                    value={duration === 0 ? "" : duration}
-                                    onChange={handleDurationChange}
-                                    className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
-                                    min="1"
-                                />
-                            </Tooltip>
+                        <div className="flex gap-1">
+                            {!isActive && (
+                                <Tooltip title="Start Timer">
+                                    <button
+                                        disabled={
+                                            duration === 0 || category === ""
+                                        }
+                                        onClick={handleStart}
+                                        className={`p-2 rounded shadow-lg ${
+                                            duration === 0 || category === ""
+                                                ? "bg-gray-400 text-gray-600"
+                                                : "bg-[var(--accent)] text-white"
+                                        }`}
+                                    >
+                                        <PlayArrowIcon />
+                                    </button>
+                                </Tooltip>
+                            )}
+                            {isActive && !isPaused && (
+                                <Tooltip title="Pause Timer">
+                                    <button
+                                        onClick={handlePause}
+                                        className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
+                                    >
+                                        <PauseIcon />
+                                    </button>
+                                </Tooltip>
+                            )}
+                            {isActive && isPaused && (
+                                <Tooltip title="Resume Timer">
+                                    <button
+                                        onClick={handleResume}
+                                        className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
+                                    >
+                                        <PlayArrowIcon />
+                                    </button>
+                                </Tooltip>
+                            )}
+                            {isActive && (
+                                <Tooltip title="Stop Timer">
+                                    <button
+                                        onClick={handleStop}
+                                        className="p-2 bg-none border-2 border-[var(--accent)] text-white rounded shadow-lg"
+                                    >
+                                        <StopIcon />
+                                    </button>
+                                </Tooltip>
+                            )}
                         </div>
-                    )}
-                    <div className="flex gap-1">
-                        {!isActive && (
-                            <Tooltip title="Start Timer">
-                                <button
-                                    disabled={duration === 0 || category === ""}
-                                    onClick={handleStart}
-                                    className={`p-2 rounded shadow-lg ${
-                                        duration === 0 || category === ""
-                                            ? "bg-gray-400 text-gray-600"
-                                            : "bg-[var(--accent)] text-white"
-                                    }`}
-                                >
-                                    <PlayArrowIcon />
-                                </button>
-                            </Tooltip>
-                        )}
-                        {isActive && !isPaused && (
-                            <Tooltip title="Pause Timer">
-                                <button
-                                    onClick={handlePause}
-                                    className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
-                                >
-                                    <PauseIcon />
-                                </button>
-                            </Tooltip>
-                        )}
-                        {isActive && isPaused && (
-                            <Tooltip title="Resume Timer">
-                                <button
-                                    onClick={handleResume}
-                                    className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
-                                >
-                                    <PlayArrowIcon />
-                                </button>
-                            </Tooltip>
-                        )}
-                        {isActive && (
-                            <Tooltip title="Stop Timer">
-                                <button
-                                    onClick={handleStop}
-                                    className="p-2 bg-none border-2 border-[var(--accent)] text-white rounded shadow-lg"
-                                >
-                                    <StopIcon />
-                                </button>
-                            </Tooltip>
-                        )}
                     </div>
-                </div>
                 )}
             </div>
         </motion.div>
