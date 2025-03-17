@@ -52,7 +52,7 @@ export default function TimerOverlay() {
     // Compute responsive overlay size based on viewport and current page.
     const computeOverlaySize = () => {
         if (typeof window !== "undefined") {
-            if (isMinimized) {
+            if (!isTimerPage && isMinimized) {
                 return { width: 60, height: 60 };
             }
 
@@ -89,7 +89,7 @@ export default function TimerOverlay() {
         setOverlaySize(computeOverlaySize());
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, [isTimerPage]);
+    }, [isTimerPage, isMinimized]);
 
     // New state to toggle between digital and analogue clock display.
     const [clockType, setClockType] = useState<"digital" | "analog">("digital");
@@ -225,13 +225,14 @@ export default function TimerOverlay() {
             initial={{ x: overlayPosition.x, y: overlayPosition.y }}
             animate={targetPosition}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed z-45"
-            style={{ width: overlaySize.width, height: overlaySize.height }}
+            className="fixed z-45 h-auto w-auto shadow-lg "
             onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
             <div
                 className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-full flex flex-col items-center justify-center ${!isTimerPage && isMinimized ? "cursor-pointer" : ""}`}
-                onClick={() => !isTimerPage && isMinimized && setIsMinimized(false)}
+                onClick={() =>
+                    !isTimerPage && isMinimized && setIsMinimized(false)
+                }
             >
                 {!isMinimized && !isTimerPage && (
                     <button
