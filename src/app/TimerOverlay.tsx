@@ -133,8 +133,8 @@ export default function TimerOverlay() {
     // Here we calculate progress relative to one hour (3600 seconds).
     // E.g. for a 15 minute (900 sec) timer, progress = 900/3600 = 0.25.
     function AnalogClock({ timeLeft }: { timeLeft: number }) {
-        const oneHour = 3600;
-        const progress = timeLeft / oneHour;
+        // const oneHour = 3600;
+        const progress = timeLeft / (duration * 60);
         const radius = 50;
         const circumference = 2 * Math.PI * radius;
         const offset = circumference * (1 - progress);
