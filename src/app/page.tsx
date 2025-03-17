@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -46,6 +45,23 @@ export default function RootPage() {
             <p className="text-gray-300">Visualize your time management improvements</p>
           </div>
         </div>
+
+        {/* Features Showcase */}
+        <div className="mt-24 text-center">
+          <h2 className="text-4xl font-bold mb-12">How TIMER Works</h2>
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="p-6 rounded-xl bg-gray-800/50 backdrop-blur">
+              <h3 className="text-2xl font-bold mb-4">Smart Time Tracking</h3>
+              <p className="text-gray-300">Automatically tracks your focus sessions and provides detailed analytics</p>
+            </div>
+            <div className="p-6 rounded-xl bg-gray-800/50 backdrop-blur">
+              <h3 className="text-2xl font-bold mb-4">Customizable Intervals</h3>
+              <p className="text-gray-300">Set your preferred work and break intervals to match your productivity rhythm</p>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
       </main>
     </div>
   );
