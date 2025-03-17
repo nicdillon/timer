@@ -89,7 +89,7 @@ export default function TimerOverlay() {
         setOverlaySize(computeOverlaySize());
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, [isTimerPage]);
+    }, [isTimerPage, isMinimized]);
 
     // New state to toggle between digital and analogue clock display.
     const [clockType, setClockType] = useState<"digital" | "analog">("digital");
@@ -231,7 +231,9 @@ export default function TimerOverlay() {
         >
             <div
                 className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-full flex flex-col items-center justify-center ${!isTimerPage && isMinimized ? "cursor-pointer" : ""}`}
-                onClick={() => !isTimerPage && isMinimized && setIsMinimized(false)}
+                onClick={() =>
+                    !isTimerPage && isMinimized && setIsMinimized(false)
+                }
             >
                 {!isMinimized && !isTimerPage && (
                     <button
