@@ -216,7 +216,7 @@ export default function TimerOverlay() {
             style={{ width: overlaySize.width, height: overlaySize.height }}
             onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
-            <div className="bg-white bg-opacity-30 rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
+            <div className="bg-[var(--paper-background)] rounded-lg shadow-lg p-2 h-full flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center h-full w-full justify-center">
                     {/* Clock Display (digital or analogue) */}
                     <div className="mb-2 w-full flex flex-col items-center justify-center">

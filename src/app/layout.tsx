@@ -90,7 +90,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       href="/timer"
                       title="Timer"
                       onClick={() => setMenuOpen(false)}
-                      className={`flex justify-center items-center ${pathname === "/timer" ? "text-black bg-white" : "text-white bg-none"}  hover:text-[var(--accent)] border border-none rounded p-1 text-center  backdrop-blur-md shadow-lg`}
+                      className={`flex justify-center items-center ${pathname === "/timer" ? "text-[var(--background)] bg-[var(--foreground)]" : "text-[var(--foreground)] bg-none"} hover:text-[var(--accent)] border border-none rounded p-1 text-center backdrop-blur-md shadow-lg`}
                     >
                       <TimerIcon fontSize="large" />
                     </Link>
