@@ -101,29 +101,14 @@ export default function TimerOverlay() {
     const computeTargetPosition = () => {
         if (isTimerPage) {
             return {
-                x:
-                    (document.documentElement.clientWidth - overlaySize.width) /
-                        2 -
-                    20,
-                y:
-                    (document.documentElement.clientHeight -
-                        overlaySize.height) /
-                    2,
+                x: (document.documentElement.clientWidth - overlaySize.width) / 2,
+                y: (document.documentElement.clientHeight - overlaySize.height) / 2,
             };
         } else {
+            const margin = Math.min(20, document.documentElement.clientWidth * 0.02);
             return {
-                x:
-                    document.documentElement.clientWidth < 600
-                        ? (document.documentElement.clientWidth -
-                              overlaySize.width) /
-                          2
-                        : document.documentElement.clientWidth -
-                          overlaySize.width -
-                          87,
-                y:
-                    document.documentElement.clientHeight -
-                    overlaySize.height -
-                    10,
+                x: document.documentElement.clientWidth - overlaySize.width - margin,
+                y: document.documentElement.clientHeight - overlaySize.height - margin,
             };
         }
     };
