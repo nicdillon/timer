@@ -3,15 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: #ffff;
   --foreground: #171717;
   /* Should be transparent with 30 opacity */
   --paper-background: rgba(255, 255, 255, 0.3);
+  --accent: #3366ff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #070f26;
     --foreground: #ededed;
     --paper-background: rgba(255, 255, 255, 0.5);
   }

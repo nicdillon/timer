@@ -11,6 +11,7 @@ function getGlobalCSSVariable(variable: string, fallback: string): string {
 const backgroundDefault = getGlobalCSSVariable('--background', '#ffffff');
 const textPrimary = getGlobalCSSVariable('--foreground', '#171717');
 const paperBackground = getGlobalCSSVariable('--paper-background', '#ffffff');
+const accent = getGlobalCSSVariable('--accent', '#3366ff')
 
 const theme = createTheme({
     palette: {
@@ -45,7 +46,17 @@ const theme = createTheme({
                     color: textPrimary,
                 },
             },
-        }
+        },
+        MuiTableCell: {
+            styleOverrides: {
+              head: {
+                // Define header cell styles for MUI tables
+                backgroundColor: accent,
+                color: textPrimary,
+                fontWeight: 'bold',
+              },
+            },
+          },
     },
 });
 

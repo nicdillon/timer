@@ -97,7 +97,7 @@ export default function TimerOverlay() {
                     document.documentElement.clientWidth < 600
                         ? (document.documentElement.clientWidth - overlaySize.width) / 2
                         : document.documentElement.clientWidth - overlaySize.width - 10,
-                y: 10,
+                y: document.documentElement.clientHeight - overlaySize.height - 10,
             };
         }
     };
@@ -150,7 +150,7 @@ export default function TimerOverlay() {
                                 y1={y1}
                                 x2={x2}
                                 y2={y2}
-                                stroke="white"
+                                stroke="gray"
                                 strokeWidth="2"
                             />
                         );
@@ -255,7 +255,7 @@ export default function TimerOverlay() {
                                     value={category}
                                     onChange={handleCategoryChange}
                                     placeholder="Category"
-                                    className="text-white text-lg p-1 border-2 border-cyan-700 rounded w-full bg-transparent text-center focus:outline-none focus:border-cyan-700 shadow-lg"
+                                    className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
                                 />
                             </Tooltip>
                             <Tooltip title="Set duration" arrow>
@@ -263,7 +263,7 @@ export default function TimerOverlay() {
                                     type="number"
                                     value={duration === 0 ? '' : duration}
                                     onChange={handleDurationChange}
-                                    className="text-white text-lg p-1 border-2 border-cyan-700 rounded w-full bg-transparent text-center focus:outline-none focus:border-cyan-700 shadow-lg"
+                                    className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
                                     min="1"
                                 />
                             </Tooltip>
@@ -276,7 +276,7 @@ export default function TimerOverlay() {
                                 onClick={handleStart}
                                 className={`px-2 py-1 rounded text-md shadow-lg ${duration === 0 || category === ''
                                     ? 'bg-gray-400 text-gray-600'
-                                    : 'bg-cyan-700 text-white'
+                                    : 'bg-[var(--accent)] text-white'
                                     }`}
                             >
                                 Start
@@ -285,7 +285,7 @@ export default function TimerOverlay() {
                         {isActive && !isPaused && (
                             <button
                                 onClick={handlePause}
-                                className="px-2 py-1 bg-cyan-700 text-white rounded text-md shadow-lg"
+                                className="px-2 py-1 bg-[var(--accent)] text-white rounded text-md shadow-lg"
                             >
                                 Pause
                             </button>
@@ -293,7 +293,7 @@ export default function TimerOverlay() {
                         {isActive && isPaused && (
                             <button
                                 onClick={handleResume}
-                                className="px-2 py-1 bg-cyan-700 text-white rounded text-md shadow-lg"
+                                className="px-2 py-1 bg-[var(--accent)] text-white rounded text-md shadow-lg"
                             >
                                 Resume
                             </button>
@@ -301,7 +301,7 @@ export default function TimerOverlay() {
                         {isActive && (
                             <button
                                 onClick={handleStop}
-                                className="px-2 py-1 bg-none border-2 border-cyan-700 text-white rounded text-md shadow-lg"
+                                className="px-2 py-1 bg-none border-2 border-[var(--accent)] text-white rounded text-md shadow-lg"
                             >
                                 Stop
                             </button>

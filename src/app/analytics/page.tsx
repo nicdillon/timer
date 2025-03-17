@@ -15,17 +15,19 @@ import {
 import { PieChart, pieArcLabelClasses, pieArcClasses } from '@mui/x-charts/PieChart';
 import { BarChart, barLabelClasses } from '@mui/x-charts/BarChart';
 import { FocusSession } from '../lib/dataTypes';
-import { aggregateByCategory, aggregateByDay, aggregateByDuration, aggregateLast7Days } from '../lib/aggregateStatistics';
+import { aggregateTimeByCategory, aggregateByDay, aggregateByDuration, aggregateLast7Days, aggregateSessionsByCategory } from '../lib/aggregateStatistics';
 
 export default function AnalyticsPage() {
   const [sessions, setSessions] = useState<FocusSession[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isTableExpanded, setIsTableExpanded] = useState<boolean>(false);
-  const dataByCategory = aggregateByCategory(sessions);
+  const dataByCategory = aggregateTimeByCategory(sessions);
+  const sessionsByCategory = aggregateSessionsByCategory(sessions);
   const dataByDay = aggregateByDay(sessions);
   const dataByDuration = aggregateByDuration(sessions);
   const dataLast7Days = aggregateLast7Days(sessions);
+  const totalFocusTime = calculateTotalFocusTime(sessions);
 
   // Pagination state.
   const [page, setPage] = useState(0);
@@ -80,6 +82,15 @@ export default function AnalyticsPage() {
     setIsTableExpanded(prev => !prev);
   }
 
+  function calculateTotalFocusTime(sessions: FocusSession[]): { hours: number, minutes: number } {
+    let totalFocusTime = 0;
+    sessions.forEach((item: FocusSession) => {
+      totalFocusTime += item.duration;
+    })
+
+    return { hours: (totalFocusTime / 60) | 0, minutes: totalFocusTime % 60 };
+  }
+
   if (isLoading)
     return (
       <div className="flex flex-col items-center justify-center h-screen w-screen">
@@ -98,104 +109,148 @@ export default function AnalyticsPage() {
     );
 
   return (
-    <div className="p-4 pt-20 flex flex-col items-center justify-center min-h-screen w-auto max-w-screen">
-      <h1 className="text-3xl font-bold mb-4">Your Focus Sessions</h1>
+    <div className="p-4 flex flex-col items-center justify-center min-h-screen w-auto max-w-screen">
+      <div className='flex flex-row justify-between items-stretch w-full mb-6'>
+        <h1 className="text-6xl font-bold mb-4 w-full items-start px-4">Analytics</h1>
+        <div className='flex flex-col justify-right items-end w-full'>
+          <h1 className="text-6xl font-bold w-full items-start text-right px-4 pr-0">{sessions.length}</h1>
+          <h3 className='text-right justify-center text-gray-400 w-auto px-2'>Total Sessions</h3>
+        </div>
+        <div className='flex flex-col justify-right items-end w-full'>
+          <h1 className="text-6xl font-bold w-full items-start text-right px-4 pr-0">{totalFocusTime.hours + 'h ' + totalFocusTime.minutes + 'm'}</h1>
+          <h3 className='text-left justify-center text-gray-400 w-auto px-2'>Total Time</h3>
+        </div>
+      </div>
+
       {/* Charts section */}
       {sessions && sessions.length > 0 ? (
-        <div className="flex flex-wrap justify-center gap-5 mb-5">
-          <Paper className="p-3 bg-none">
-            <h2 className="text-xl text-center mb-2">Total Focus Time by Category</h2>
-            <PieChart
-              series={[
-                {
-                  data: dataByCategory,
-                  innerRadius: 30,
-                  outerRadius: 100,
-                  paddingAngle: 2,
-                  cornerRadius: 5,
-                },
-              ]}
-              slotProps={{
-                legend: {
-                  direction: 'column',
-                  position: { vertical: 'middle', horizontal: 'right' },
-                  padding: 0,
-                  itemGap: 2,
-                },
-              }}
-              colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
-              width={chartWidth}
-              height={200}
-              sx={{
-                [`& .${pieArcLabelClasses.root}`]: { color: 'black', fill: 'white' },
-                [`& .${pieArcClasses.root}`]: { stroke: 'none' },
-              }}
-            />
+        <div className="flex flex-wrap justify-center gap-2 mb-5">
+          <Paper className="p-3 bg-none flex flex-wrap flex-col gap-4">
+            <h2 className="text-2xl text-left mb-2">Focus Time</h2>
+            <Paper elevation={5} className='flex flex-col items-center justify-center pt-4 pb-4'>
+              <h3 className='text-gray-600 text-lg text-center mb-2'>Focus Time last 7 Days</h3>
+              <BarChart
+                dataset={dataLast7Days}
+                series={[
+                  {
+                    data: dataLast7Days.map((item) => item.value),
+                  },
+                ]}
+                xAxis={[{ scaleType: 'band', dataKey: 'date' }]}
+                width={chartWidth}
+                colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
+                height={200}
+                sx={{ [`& .${barLabelClasses.root}`]: { color: 'black', fill: 'black' }, }}
+              />
+            </Paper>
+            <Paper elevation={5} className='flex flex-col items-center justify-center pt-4 pb-4'>
+              <h3 className='text-gray-600 text-lg text-center mb-2'>Time by Category</h3>
+              <PieChart
+                series={[
+                  {
+                    data: dataByCategory,
+                    innerRadius: 30,
+                    outerRadius: 100,
+                    paddingAngle: 2,
+                    cornerRadius: 2,
+                  },
+                ]}
+                slotProps={{
+                  legend: {
+                    direction: 'column',
+                    position: { vertical: 'middle', horizontal: 'right' },
+                    padding: 0,
+                    itemGap: 2,
+                  },
+                }}
+                colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
+                width={chartWidth}
+                height={200}
+                sx={{
+                  [`& .${pieArcLabelClasses.root}`]: { color: 'black', fill: 'white' },
+                  [`& .${pieArcClasses.root}`]: { stroke: 'none' },
+                }}
+              />
+            </Paper>
+            <Paper elevation={5} className='flex flex-col items-center justify-center pt-4 pb-4'>
+              <h3 className='text-gray-600 text-lg text-center mb-2'>Time by Day of the Week</h3>
+              <PieChart
+                series={[
+                  {
+                    data: dataByDay,
+                    innerRadius: 30,
+                    outerRadius: 100,
+                    paddingAngle: 2,
+                    cornerRadius: 2,
+                  },
+                ]}
+                slotProps={{
+                  legend: { direction: 'column', position: { vertical: 'middle', horizontal: 'right' }, padding: 0 },
+                }}
+                colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
+                width={chartWidth}
+                height={200}
+                sx={{
+                  [`& .${pieArcLabelClasses.root}`]: { color: 'white', fill: 'white' },
+                  [`& .${pieArcClasses.root}`]: { stroke: 'none' },
+                }}
+              />
+            </Paper>
           </Paper>
-          <Paper className="p-3">
-            <h2 className="text-xl text-center mb-2">Total Focus Time by Day of Week</h2>
-            <PieChart
-              series={[
-                {
-                  data: dataByDay,
-                  innerRadius: 30,
-                  outerRadius: 100,
-                  paddingAngle: 2,
-                  cornerRadius: 5,
-                },
-              ]}
-              slotProps={{
-                legend: { direction: 'column', position: { vertical: 'middle', horizontal: 'right' }, padding: 0 },
-              }}
-              colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
-              width={chartWidth}
-              height={200}
-              sx={{
-                [`& .${pieArcLabelClasses.root}`]: { color: 'white', fill: 'white' },
-                [`& .${pieArcClasses.root}`]: { stroke: 'none' },
-              }}
-            />
-          </Paper>
-          <Paper className="p-3">
-            <h2 className="text-xl text-center mb-2">Focus Sessions by Duration</h2>
-            <PieChart
-              series={[
-                {
-                  data: dataByDuration,
-                  innerRadius: 30,
-                  outerRadius: 100,
-                  paddingAngle: 5,
-                  cornerRadius: 5,
-                },
-              ]}
-              slotProps={{
-                legend: { direction: 'column', position: { vertical: 'middle', horizontal: 'right' }, padding: 0 },
-              }}
-              colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
-              width={chartWidth}
-              height={200}
-              sx={{
-                [`& .${pieArcLabelClasses.root}`]: { color: 'white', fill: 'white' },
-                [`& .${pieArcClasses.root}`]: { stroke: 'none' },
-              }}
-            />
-          </Paper>
-          {/* New MUI Sparkline Chart for Last 7 Days */}
-          <Paper className="p-3">
-            <h2 className="text-xl text-center mb-2">Focus Time Over Last 7 Days</h2>
-            <BarChart
-              dataset={dataLast7Days}
-              series={[
-                {
-                  data: dataLast7Days.map((item) => item.value),
-                },
-              ]}
-              xAxis={[{ scaleType: 'band', dataKey: 'date'}]}
-              width={chartWidth}
-              colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
-              height={200}
-              sx={{[`& .${barLabelClasses.root}`]: { color: 'black', fill: 'black' },}}
-            />
+
+          {/* <Paper className="p-3">
+            
+          </Paper> */}
+          <Paper className="p-3 bg-none flex flex-wrap flex-col gap-4">
+            <h2 className="text-2xl text-left mb-2">Sessions</h2>
+            <Paper elevation={5} className='flex flex-col items-center justify-center pt-4 pb-4'>
+              <h3 className='text-gray-600 text-lg text-center mb-2'>Durations</h3>
+              <PieChart
+                series={[
+                  {
+                    data: dataByDuration,
+                    innerRadius: 30,
+                    outerRadius: 100,
+                    paddingAngle: 2,
+                    cornerRadius: 2,
+                  },
+                ]}
+                slotProps={{
+                  legend: { direction: 'column', position: { vertical: 'middle', horizontal: 'right' }, padding: 0 },
+                }}
+                colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
+                width={chartWidth}
+                height={200}
+                sx={{
+                  [`& .${pieArcLabelClasses.root}`]: { color: 'white', fill: 'white' },
+                  [`& .${pieArcClasses.root}`]: { stroke: 'none' },
+                }}
+              />
+            </Paper>
+            <Paper elevation={5} className='flex flex-col items-center justify-center pt-4 pb-4'>
+              <h3 className='text-gray-600 text-lg text-center mb-2'>Categories</h3>
+              <PieChart
+                series={[
+                  {
+                    data: sessionsByCategory,
+                    innerRadius: 30,
+                    outerRadius: 100,
+                    paddingAngle: 2,
+                    cornerRadius: 2,
+                  },
+                ]}
+                slotProps={{
+                  legend: { direction: 'column', position: { vertical: 'middle', horizontal: 'right' }, padding: 0 },
+                }}
+                colors={['#0D1B2A', '#1B263B', '#415A77', '#1E3A8A', '#1E40AF']}
+                width={chartWidth}
+                height={200}
+                sx={{
+                  [`& .${pieArcLabelClasses.root}`]: { color: 'black', fill: 'black' },
+                  [`& .${pieArcClasses.root}`]: { stroke: 'none' },
+                }}
+              />
+            </Paper>
           </Paper>
         </div>
       ) : (
@@ -204,14 +259,14 @@ export default function AnalyticsPage() {
       {/* The table displaying individual focus sessions */}
       {sessions && sessions.length > 0 && !isTableExpanded && (
         <div>
-          <button onClick={handleExpandTable} className="bg-cyan-500 text-white px-4 py-2 rounded">
+          <button onClick={handleExpandTable} className="bg-[var(--accent)] text-white px-4 py-2 rounded">
             Show All Focus Sessions
           </button>
         </div>
       )}
       {sessions && sessions.length > 0 && isTableExpanded && (
         <div className="flex flex-col width-full gap-2 justify-center items-center">
-          <button onClick={handleExpandTable} className="border-2 border-cyan-700 bg-gray-700 bg-opacity-30 text-white px-4 py-2 rounded w-auto shadow-lg">
+          <button onClick={handleExpandTable} className="border-2 border-[var(--accent)] bg-gray-700 bg-opacity-30 text-white px-4 py-2 rounded w-auto shadow-lg">
             Hide All Focus Sessions
           </button>
           <Paper className="shadow-lg" sx={{ width: '100%', overflow: 'hidden' }}>

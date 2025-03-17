@@ -1,6 +1,6 @@
 import { FocusSession } from './dataTypes';
 
-export function aggregateByCategory(sessions: FocusSession[]) {
+export function aggregateTimeByCategory(sessions: FocusSession[]) {
   const aggregated = sessions.reduce((acc, session) => {
     acc[session.category] = (acc[session.category] || 0) + session.duration;
     return acc;
@@ -10,6 +10,18 @@ export function aggregateByCategory(sessions: FocusSession[]) {
     label,
     value,
   }));
+}
+
+export function aggregateSessionsByCategory(sessions: FocusSession[]) {
+    const aggregated = sessions.reduce((acc, session) => {
+        acc[session.category] = (acc[session.category] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      return Object.entries(aggregated).map(([label, value], index) => ({
+        id: index,
+        label,
+        value,
+      }));
 }
 
 export function aggregateByDay(sessions: FocusSession[]) {
@@ -59,5 +71,5 @@ export function aggregateLast7Days(sessions: FocusSession[]) {
         };
     })
 
-    return last7Days;
+    return last7Days.reverse();
 }
