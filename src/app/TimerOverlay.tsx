@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import Tooltip from "@mui/material/Tooltip";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import StopIcon from "@mui/icons-material/Stop";
 import { useTimer } from "./TimerContext";
 import { useTimerContext } from "./TimerContext";
 import { usePathname } from "next/navigation";
@@ -280,41 +283,49 @@ export default function TimerOverlay() {
                     )}
                     <div className="flex gap-1">
                         {!isActive && (
-                            <button
-                                disabled={duration === 0 || category === ""}
-                                onClick={handleStart}
-                                className={`px-2 py-1 rounded text-md shadow-lg ${
-                                    duration === 0 || category === ""
-                                        ? "bg-gray-400 text-gray-600"
-                                        : "bg-[var(--accent)] text-white"
-                                }`}
-                            >
-                                Start
-                            </button>
+                            <Tooltip title="Start Timer">
+                                <button
+                                    disabled={duration === 0 || category === ""}
+                                    onClick={handleStart}
+                                    className={`p-2 rounded shadow-lg ${
+                                        duration === 0 || category === ""
+                                            ? "bg-gray-400 text-gray-600"
+                                            : "bg-[var(--accent)] text-white"
+                                    }`}
+                                >
+                                    <PlayArrowIcon />
+                                </button>
+                            </Tooltip>
                         )}
                         {isActive && !isPaused && (
-                            <button
-                                onClick={handlePause}
-                                className="px-2 py-1 bg-[var(--accent)] text-white rounded text-md shadow-lg"
-                            >
-                                Pause
-                            </button>
+                            <Tooltip title="Pause Timer">
+                                <button
+                                    onClick={handlePause}
+                                    className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
+                                >
+                                    <PauseIcon />
+                                </button>
+                            </Tooltip>
                         )}
                         {isActive && isPaused && (
-                            <button
-                                onClick={handleResume}
-                                className="px-2 py-1 bg-[var(--accent)] text-white rounded text-md shadow-lg"
-                            >
-                                Resume
-                            </button>
+                            <Tooltip title="Resume Timer">
+                                <button
+                                    onClick={handleResume}
+                                    className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
+                                >
+                                    <PlayArrowIcon />
+                                </button>
+                            </Tooltip>
                         )}
                         {isActive && (
-                            <button
-                                onClick={handleStop}
-                                className="px-2 py-1 bg-none border-2 border-[var(--accent)] text-white rounded text-md shadow-lg"
-                            >
-                                Stop
-                            </button>
+                            <Tooltip title="Stop Timer">
+                                <button
+                                    onClick={handleStop}
+                                    className="p-2 bg-none border-2 border-[var(--accent)] text-white rounded shadow-lg"
+                                >
+                                    <StopIcon />
+                                </button>
+                            </Tooltip>
                         )}
                     </div>
                 </div>
