@@ -58,7 +58,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setHasMounted(true);
   }, []);
-  
+
   const [overlayPosition, setOverlayPosition] = useState<OverlayPosition>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('overlayPosition');
@@ -149,7 +149,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   //   setIsActive(true);
   //   setIsPaused(false);
   //   hasFinished.current = false;
-  
+
   //   // After a short delay, trigger the timer finish logic
   //   setTimeout(() => {
   //     handleTimerFinish();
@@ -171,8 +171,38 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     hasFinished.current = false;
   };
 
-  const handleStop = () => {
+  const handleStop = async () => {
+    const userId = user ? user.sub : null;
+
+    if (userId && !isLoading) {
+      const sessionData: FocusSession = {
+        id: null,
+        user_id: userId,
+        category,
+        duration: Math.round((duration * 60 - timeLeft) / 60), // Convert actual time spent to minutes
+        start_time: new Date()
+      };
+
+      try {
+        const res = await fetch('/api/sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(sessionData)
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'Failed to save session');
+        }
+      } catch (err) {
+        console.error('Error saving focus session:', err);
+      }
+    }
+
     setIsActive(false);
+    setIsPaused(false);
     setTimeLeft(duration * 60);
   };
 
