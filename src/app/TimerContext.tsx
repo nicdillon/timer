@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, {
   createContext,
@@ -6,10 +6,10 @@ import React, {
   useState,
   useEffect,
   useRef,
-  ReactNode
-} from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { FocusSession } from './lib/dataTypes';
+  ReactNode,
+} from "react";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { FocusSession } from "./lib/dataTypes";
 
 interface TimerContextProps {
   overlayPosition: OverlayPosition;
@@ -39,7 +39,7 @@ const TimerContext = createContext<TimerContextProps | undefined>(undefined);
 export const useTimer = () => {
   const context = useContext(TimerContext);
   if (!context) {
-    throw new Error('useTimer must be used within a TimerProvider');
+    throw new Error("useTimer must be used within a TimerProvider");
   }
   return context;
 };
@@ -47,7 +47,7 @@ export const useTimer = () => {
 export function useTimerContext() {
   const context = useContext(TimerContext);
   if (!context) {
-    throw new Error('useTimerContext must be used within a TimerProvider');
+    throw new Error("useTimerContext must be used within a TimerProvider");
   }
   return context;
 }
@@ -59,32 +59,33 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     setHasMounted(true);
   }, []);
 
-  const [overlayPosition, setOverlayPosition] = useState<OverlayPosition>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('overlayPosition');
-      if (saved) {
-        return JSON.parse(saved);
+  const [overlayPosition, setOverlayPosition] = useState<OverlayPosition>(
+    () => {
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("overlayPosition");
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } else {
+        return { x: 0, y: 0 };
       }
-    }
-    else {
-      return {x: 0, y: 0};
-    }
-    return {
-      x: document.documentElement.clientWidth / 2,
-      y: document.documentElement.clientHeight,
-    };
-  });
+      return {
+        x: document.documentElement.clientWidth / 2,
+        y: document.documentElement.clientHeight,
+      };
+    },
+  );
   const [duration, setDuration] = useState(25);
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [category, setCategory] = useState('Category');
+  const [category, setCategory] = useState("Category");
   const hasFinished = useRef(false);
   const { user, isLoading, error } = useUser();
 
   // Load saved overlayPosition from localStorage on mount.
   useEffect(() => {
-    const savedOverlayPosition = localStorage.getItem('overlayPosition');
+    const savedOverlayPosition = localStorage.getItem("overlayPosition");
     if (savedOverlayPosition) {
       setOverlayPosition(JSON.parse(savedOverlayPosition));
     }
@@ -92,16 +93,16 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
 
   // Persist overlayPosition changes to localStorage.
   useEffect(() => {
-    localStorage.setItem('overlayPosition', JSON.stringify(overlayPosition));
+    localStorage.setItem("overlayPosition", JSON.stringify(overlayPosition));
   }, [overlayPosition]);
 
   // Load saved state from localStorage on mount
   useEffect(() => {
-    const savedDuration = localStorage.getItem('duration');
-    const savedTimeLeft = localStorage.getItem('timeLeft');
-    const savedIsActive = localStorage.getItem('isActive');
-    const savedIsPaused = localStorage.getItem('isPaused');
-    const savedCategory = localStorage.getItem('category');
+    const savedDuration = localStorage.getItem("duration");
+    const savedTimeLeft = localStorage.getItem("timeLeft");
+    const savedIsActive = localStorage.getItem("isActive");
+    const savedIsPaused = localStorage.getItem("isPaused");
+    const savedCategory = localStorage.getItem("category");
 
     if (savedDuration) setDuration(parseInt(savedDuration));
     if (savedTimeLeft) setTimeLeft(parseInt(savedTimeLeft));
@@ -112,11 +113,11 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
 
   // Sync state to localStorage when values change
   useEffect(() => {
-    localStorage.setItem('duration', duration.toString());
-    localStorage.setItem('timeLeft', timeLeft.toString());
-    localStorage.setItem('isActive', JSON.stringify(isActive));
-    localStorage.setItem('isPaused', JSON.stringify(isPaused));
-    localStorage.setItem('category', category);
+    localStorage.setItem("duration", duration.toString());
+    localStorage.setItem("timeLeft", timeLeft.toString());
+    localStorage.setItem("isActive", JSON.stringify(isActive));
+    localStorage.setItem("isPaused", JSON.stringify(isPaused));
+    localStorage.setItem("category", category);
   }, [duration, timeLeft, isActive, isPaused, category]);
 
   // Timer interval logic
@@ -180,24 +181,24 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
         user_id: userId,
         category,
         duration: Math.round((duration * 60 - timeLeft) / 60), // Convert actual time spent to minutes
-        start_time: new Date()
+        start_time: new Date(),
       };
 
       try {
-        const res = await fetch('/api/sessions', {
-          method: 'POST',
+        const res = await fetch("/api/sessions", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(sessionData)
+          body: JSON.stringify(sessionData),
         });
 
         if (!res.ok) {
           const err = await res.json();
-          throw new Error(err.error || 'Failed to save session');
+          throw new Error(err.error || "Failed to save session");
         }
       } catch (err) {
-        console.error('Error saving focus session:', err);
+        console.error("Error saving focus session:", err);
       }
     }
 
@@ -207,7 +208,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   };
 
   const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value === '') {
+    if (e.target.value === "") {
       setDuration(0);
       setTimeLeft(0);
       return;
@@ -224,7 +225,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
   const handleTimerFinish = async () => {
@@ -233,7 +234,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
 
     setTimeLeft(duration * 60);
 
-    const audio = new Audio('/alarm.wav');
+    const audio = new Audio("/alarm.wav");
     audio.play();
 
     setIsActive(false);
@@ -241,14 +242,14 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     if (isLoading) return;
 
     if (error) {
-      console.error('Error fetching user:', error);
+      console.error("Error fetching user:", error);
       return;
     }
 
     const userId = user ? user.sub : null;
 
     if (!userId) {
-      console.error('User is not authenticated. Focus session not saved.');
+      console.error("User is not authenticated. Focus session not saved.");
       return;
     }
 
@@ -260,24 +261,23 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
       start_time: new Date(),
     };
 
-    console.log('Saving focus session:', sessionData);
+    console.log("Saving focus session:", sessionData);
 
     try {
-      const res = await fetch('/api/sessions', {
-        method: 'POST',
+      const res = await fetch("/api/sessions", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(sessionData)
+        body: JSON.stringify(sessionData),
       });
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || 'Failed to save session');
+        throw new Error(err.error || "Failed to save session");
       }
-
     } catch (err) {
-      console.error('Error saving focus session:', err);
+      console.error("Error saving focus session:", err);
     }
   };
 
