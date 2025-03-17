@@ -230,10 +230,10 @@ export default function TimerOverlay() {
             onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
             <div
-                className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-full flex flex-col items-center justify-center cursor-pointer`}
-                onClick={() => isMinimized && setIsMinimized(false)}
+                className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-full flex flex-col items-center justify-center ${!isTimerPage && isMinimized ? "cursor-pointer" : ""}`}
+                onClick={() => !isTimerPage && isMinimized && setIsMinimized(false)}
             >
-                {!isMinimized && (
+                {!isMinimized && !isTimerPage && (
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
