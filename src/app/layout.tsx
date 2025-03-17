@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ThemeProvider theme={Theme}>
           <body className="min-h-screen flex flex-row w-screen">
             <TimerProvider>
-              <nav className={`p-4 sticky top-0 h-full w-auto md:h-screen flex flex-col md:gap-4 md:bg-none md:shadow-none md:backdrop-blur-none z-50 ${menuOpen ? 'bg-white  backdrop-blur-md shadow-lg' : ''}`}>
+              <nav className={`p-4 sticky md:w-20 top-0 h-full md:border-r border-gray-700 md:h-screen flex flex-col md:gap-4 md:bg-none md:shadow-lg md:backdrop-blur-none z-50 ${menuOpen ? 'bg-white  backdrop-blur-md shadow-lg' : ''}`}>
                 {/* <img src='/TIMERLogo.svg' className='w-auto h-16 object-conatain' height={64} width={64}></img> */}
                 <div className="flex justify-between items-center md:hidden">
                   <button type="button" onClick={toggleMenu} className="text-[var(--accent)] focus:outline-none">

@@ -88,7 +88,7 @@ export default function TimerOverlay() {
     const computeTargetPosition = () => {
         if (isRoot) {
             return {
-                x: (document.documentElement.clientWidth - overlaySize.width) / 2,
+                x: (document.documentElement.clientWidth - overlaySize.width) / 2 - 20,
                 y: (document.documentElement.clientHeight - overlaySize.height) / 2,
             };
         } else {
@@ -96,7 +96,7 @@ export default function TimerOverlay() {
                 x:
                     document.documentElement.clientWidth < 600
                         ? (document.documentElement.clientWidth - overlaySize.width) / 2
-                        : document.documentElement.clientWidth - overlaySize.width - 10,
+                        : document.documentElement.clientWidth - overlaySize.width - 87,
                 y: document.documentElement.clientHeight - overlaySize.height - 10,
             };
         }
