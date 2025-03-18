@@ -51,15 +51,6 @@ export default function Timer() {
         }
     }, [pathname]);
 
-    // useEffect(() => {
-    //     // const handleResize = () => {
-    //     //     setOverlaySize(computeOverlaySize());
-    //     // };
-    //     // setOverlaySize(computeOverlaySize());
-    //     // window.addEventListener("resize", handleResize);
-    //     // return () => window.removeEventListener("resize", handleResize);
-    // }, [isTimerPage, isMinimized]);
-
     if (!hasMounted) return null;
 
     function DigitalClock({ time, label }: { time: number; label?: string }) {
@@ -142,31 +133,6 @@ export default function Timer() {
         );
     }
 
-    const renderModeSelector = () => {
-        return (
-            <div className="mb-4 flex flex-row gap-2">
-                <button
-                    className={`p-2 rounded ${timerMode === "timer" ? "border-none text-white bg-[var(--accent)]" : "border border-[var(--accent)]"}  bg-none shadow-lg  rounded`}
-                    onClick={() => setTimerMode("timer")}
-                >
-                    Standard
-                </button>
-                <button
-                    className={`p-2 rounded ${timerMode === "stopwatch" ? "border-none text-white bg-[var(--accent)]" : "border border-[var(--accent)]"} shadow-lg rounded`}
-                    onClick={() => setTimerMode("stopwatch")}
-                >
-                    Stopwatch
-                </button>
-                <button
-                    className={`p-2 rounded ${timerMode === "pomodoro" ? "border-none text-white bg-[var(--accent)]" : "border border-[var(--accent)]"} shadow-lg rounded`}
-                    onClick={() => setTimerMode("pomodoro")}
-                >
-                    Pomodoro
-                </button>
-            </div>
-        );
-    };
-
     const renderPomodoroConfig = () => {
         return (
             <div className="flex flex-col w-auto h-auto justify-center items-center gap-4">
@@ -197,14 +163,12 @@ export default function Timer() {
                     onChange={(e) => {
                         if (e.target.value === "") {
                             setPomodoroConfig("breakTime", 5);
-                            // handleDurationChange(0);
                             return;
                         }
                         setPomodoroConfig(
                             "breakTime",
                             parseInt(e.target.value, 5),
                         );
-                        // handleDurationChange(pomodoroConfig.focusTime * 60);
                     }}
                 />
             </div>
@@ -213,7 +177,7 @@ export default function Timer() {
 
     return (
         <motion.div
-            className={`z-45 h-full w-full flex justify-center items-center ${isMinimized ? "hidden" : ""}`}
+            className={`z-45 h-auto w-full flex justify-center items-center ${isMinimized ? "hidden" : ""}`}
         >
             <div
                 className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-auto flex flex-col items-center justify-center ${!isTimerPage && isMinimized ? "cursor-pointer" : ""}`}
@@ -267,7 +231,6 @@ export default function Timer() {
                 ) : (
                     <div className="flex flex-col items-center h-auto w-auto justify-center">
                         <div className="mb-2 w-auto flex flex-col items-center justify-center">
-                            {!isActive && renderModeSelector()}
                             <div className="mb-4 w-full flex justify-center items-center">
                                 {isActive ? (
                                     clockType === "digital" ? (

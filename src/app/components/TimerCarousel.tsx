@@ -26,7 +26,7 @@ export default function TimerCarousel() {
               currentIndex === index
                 ? "scale-100 opacity-100"
                 : "scale-90 opacity-60"
-            }`}
+            } flex flex-col justify-center items-center gap-4`}
             initial={false}
             animate={{
               scale: currentIndex === index ? 1 : 0.9,
@@ -35,6 +35,7 @@ export default function TimerCarousel() {
             transition={{ duration: 0.3 }}
             onClick={() => handleSlideChange(index)}
           >
+            <h2 className="text-xl capitalize">{mode}</h2>
             <Timer mode={mode} />
           </motion.div>
         ))}
