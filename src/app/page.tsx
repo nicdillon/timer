@@ -6,7 +6,8 @@ export const metadata = {
   title: "TIMER - Your Personal Time Management Tool",
   description:
     "TIMER helps you boost productivity with customizable timers, task tracking, and focus management tools.",
-  keywords: "timer, productivity, time management, focus timer, pomodoro",
+  keywords:
+    "timer, productivity, time management, focus timer, pomodoro, analytics",
 };
 
 export default function RootPage() {

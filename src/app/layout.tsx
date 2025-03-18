@@ -21,8 +21,12 @@ import { ThemeProvider } from "@mui/material/styles";
 function LayoutContent({ children }: { children: ReactNode }) {
   // Now always include TimerOverlay so it can animate between positions.
 
+  const pathname = usePathname();
+
   return (
-    <div className="flex flex-col w-full justify-center items-start">
+    <div
+      className={`flex flex-col w-full justify-center items-start ${pathname === "/" || pathname === "" ? "" : "p-2 pl-0"} bg-[var(--foreground)]`}
+    >
       <main className="flex-grow w-full">{children}</main>
       <TimerOverlay />
     </div>
@@ -66,7 +70,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <body className="min-h-screen flex flex-row w-screen">
             <TimerProvider>
               <nav
-                className={`p-4 ${pathname === "/" ? "hidden" : "flex"} sticky md:w-20 top-0 h-screen md:border-r border-[var(--accent)] md:h-screen flex-col md:gap-4 md:bg-white md:shadow-lg md:backdrop-blur-md z-50 ${menuOpen ? "bg-white  backdrop-blur-md shadow-lg" : ""}`}
+                className={`p-4 ${pathname === "/" ? "hidden" : "flex"} sticky md:w-20 top-0 h-screen md:h-screen flex-col md:gap-4 md:bg-[var(--foreground)] md:backdrop-blur-md z-50 ${menuOpen ? "bg-[var(--foreground)]  backdrop-blur-md shadow-lg" : ""}`}
               >
                 {/* <img src='/TIMERLogo.svg' className='w-auto h-16 object-conatain' height={64} width={64}></img> */}
                 <div className="flex justify-between items-center md:hidden">

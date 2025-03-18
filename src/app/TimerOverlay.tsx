@@ -38,7 +38,7 @@ export default function TimerOverlay() {
         pomodoroConfig,
         handlePomodoroConfigChange,
         overlayPosition,
-        setOverlayPosition
+        setOverlayPosition,
     } = useTimer();
 
     useEffect(() => {
@@ -59,11 +59,23 @@ export default function TimerOverlay() {
 
             let width: number, height: number;
             if (isTimerPage) {
-                width = document.documentElement.clientWidth < 600 ? document.documentElement.clientWidth * 0.9 : 400;
-                height = document.documentElement.clientHeight < 600 ? document.documentElement.clientHeight * 0.5 : 400;
+                width =
+                    document.documentElement.clientWidth < 600
+                        ? document.documentElement.clientWidth * 0.9
+                        : 400;
+                height =
+                    document.documentElement.clientHeight < 600
+                        ? document.documentElement.clientHeight * 0.5
+                        : 400;
             } else {
-                width = document.documentElement.clientWidth < 600 ? document.documentElement.clientWidth * 0.7 : 250;
-                height = document.documentElement.clientHeight < 600 ? document.documentElement.clientHeight * 0.3 : 250;
+                width =
+                    document.documentElement.clientWidth < 600
+                        ? document.documentElement.clientWidth * 0.7
+                        : 250;
+                height =
+                    document.documentElement.clientHeight < 600
+                        ? document.documentElement.clientHeight * 0.3
+                        : 250;
             }
             return { width, height };
         } else {
@@ -85,13 +97,29 @@ export default function TimerOverlay() {
     const computeTargetPosition = () => {
         if (isTimerPage) {
             return {
-                x: (document.documentElement.clientWidth - overlaySize.width) / 2 - 20,
-                y: (document.documentElement.clientHeight - overlaySize.height) / 2,
+                x:
+                    (document.documentElement.clientWidth - overlaySize.width) /
+                        2 -
+                    20,
+                y:
+                    (document.documentElement.clientHeight -
+                        overlaySize.height) /
+                    2,
             };
         } else {
             return {
-                x: document.documentElement.clientWidth < 600 ? (document.documentElement.clientWidth - overlaySize.width) / 2 : document.documentElement.clientWidth - overlaySize.width - 87,
-                y: document.documentElement.clientHeight - overlaySize.height - 10,
+                x:
+                    document.documentElement.clientWidth < 600
+                        ? (document.documentElement.clientWidth -
+                              overlaySize.width) /
+                          2
+                        : document.documentElement.clientWidth -
+                          overlaySize.width -
+                          87,
+                y:
+                    document.documentElement.clientHeight -
+                    overlaySize.height -
+                    10,
             };
         }
     };
@@ -100,7 +128,9 @@ export default function TimerOverlay() {
 
     function DigitalClock({ time, label }: { time: number; label?: string }) {
         return (
-            <span className={`text-6xl font-bold ${!isPaused && isActive ? "text-white" : "text-gray-400"}`}>
+            <span
+                className={`text-6xl font-bold ${!isPaused && isActive ? "text-white" : "text-gray-400"}`}
+            >
                 {formatTime(time)} {label && `(${label})`}
             </span>
         );
@@ -122,7 +152,17 @@ export default function TimerOverlay() {
                         const y1 = 60 + radius * 1 * Math.sin(rad);
                         const x2 = 60 + radius * 0.8 * Math.cos(rad);
                         const y2 = 60 + radius * 0.8 * Math.sin(rad);
-                        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="gray" strokeWidth="2" />;
+                        return (
+                            <line
+                                key={i}
+                                x1={x1}
+                                y1={y1}
+                                x2={x2}
+                                y2={y2}
+                                stroke="gray"
+                                strokeWidth="2"
+                            />
+                        );
                     })}
                 </>
             );
@@ -130,10 +170,33 @@ export default function TimerOverlay() {
 
         return (
             <svg width="100%" height="100%" viewBox={`0 0 120 120`}>
-                <circle cx="60" cy="60" r={radius} stroke="black" strokeWidth="8" fill="black" />
-                <circle cx="60" cy="60" r={radius} stroke="red" strokeWidth="12" fill="none" strokeDasharray={circumference} strokeDashoffset={offset} transform="rotate(-90,60,60)" />
+                <circle
+                    cx="60"
+                    cy="60"
+                    r={radius}
+                    stroke="black"
+                    strokeWidth="8"
+                    fill="black"
+                />
+                <circle
+                    cx="60"
+                    cy="60"
+                    r={radius}
+                    stroke="red"
+                    strokeWidth="12"
+                    fill="none"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={offset}
+                    transform="rotate(-90,60,60)"
+                />
                 {renderTickMarks(radius)}
-                <text x="60" y={60 + radius / 6} textAnchor="middle" fill={isActive ? "white" : "gray"} fontSize={radius / 2}>
+                <text
+                    x="60"
+                    y={60 + radius / 6}
+                    textAnchor="middle"
+                    fill={isActive ? "white" : "gray"}
+                    fontSize={radius / 2}
+                >
                     {formatTime(time)}
                 </text>
             </svg>
@@ -143,9 +206,15 @@ export default function TimerOverlay() {
     const renderModeSelector = () => {
         return (
             <div className="mb-4">
-                <button onClick={() => handleTimerModeChange('standard')}>Standard</button>
-                <button onClick={() => handleTimerModeChange('stopwatch')}>Stopwatch</button>
-                <button onClick={() => handleTimerModeChange('pomodoro')}>Pomodoro</button>
+                <button onClick={() => handleTimerModeChange("standard")}>
+                    Standard
+                </button>
+                <button onClick={() => handleTimerModeChange("stopwatch")}>
+                    Stopwatch
+                </button>
+                <button onClick={() => handleTimerModeChange("pomodoro")}>
+                    Pomodoro
+                </button>
             </div>
         );
     };
@@ -155,18 +224,28 @@ export default function TimerOverlay() {
             <div>
                 <label>
                     Focus Time:
-                    <input 
-                        type="number" 
-                        value={pomodoroConfig.focusTime} 
-                        onChange={(e) => handlePomodoroConfigChange('focusTime', parseInt(e.target.value, 10))} 
+                    <input
+                        type="number"
+                        value={pomodoroConfig.focusTime}
+                        onChange={(e) =>
+                            handlePomodoroConfigChange(
+                                "focusTime",
+                                parseInt(e.target.value, 10),
+                            )
+                        }
                     />
                 </label>
                 <label>
                     Break Time:
-                    <input 
-                        type="number" 
-                        value={pomodoroConfig.breakTime} 
-                        onChange={(e) => handlePomodoroConfigChange('breakTime', parseInt(e.target.value, 10))} 
+                    <input
+                        type="number"
+                        value={pomodoroConfig.breakTime}
+                        onChange={(e) =>
+                            handlePomodoroConfigChange(
+                                "breakTime",
+                                parseInt(e.target.value, 10),
+                            )
+                        }
                     />
                 </label>
             </div>
@@ -181,13 +260,14 @@ export default function TimerOverlay() {
             initial={{ x: overlayPosition.x, y: overlayPosition.y }}
             animate={targetPosition}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed z-45"
-            style={{ width: overlaySize.width, height: overlaySize.height }}
+            className="sticky z-45 h-auto w-auto"
             onAnimationComplete={() => setOverlayPosition(targetPosition)}
         >
             <div
                 className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-full flex flex-col items-center justify-center ${!isTimerPage && isMinimized ? "cursor-pointer" : ""}`}
-                onClick={() => !isTimerPage && isMinimized && setIsMinimized(false)}
+                onClick={() =>
+                    !isTimerPage && isMinimized && setIsMinimized(false)
+                }
             >
                 {!isMinimized && !isTimerPage && (
                     <button
@@ -197,33 +277,72 @@ export default function TimerOverlay() {
                         }}
                         className="absolute top-2 right-2 text-[var(--accent)] hover:text-[var(--accent-dark)]"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                            />
                         </svg>
                     </button>
                 )}
                 {isMinimized ? (
                     <div className="w-full h-full flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="32"
+                            height="32"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                        >
                             <circle cx="12" cy="12" r="10" strokeWidth={2} />
-                            <path strokeLinecap="round" strokeWidth={2} d="M12 6v6l4 2" />
+                            <path
+                                strokeLinecap="round"
+                                strokeWidth={2}
+                                d="M12 6v6l4 2"
+                            />
                         </svg>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center h-full w-full justify-center">
                         <div className="mb-2 w-full flex flex-col items-center justify-center">
                             {renderModeSelector()}
-                            {timerMode === 'pomodoro' && renderPomodoroConfig()}
+                            {timerMode === "pomodoro" && renderPomodoroConfig()}
                             <div className="mb-4">
                                 {isActive ? (
                                     clockType === "digital" ? (
-                                        <DigitalClock 
-                                            time={timerMode === 'stopwatch' ? elapsedTime : timeLeft} 
-                                            label={timerMode === 'pomodoro' ? (pomodoroConfig.isBreak ? 'Break' : 'Focus') : ''} 
+                                        <DigitalClock
+                                            time={
+                                                timerMode === "stopwatch"
+                                                    ? elapsedTime
+                                                    : timeLeft
+                                            }
+                                            label={
+                                                timerMode === "pomodoro"
+                                                    ? pomodoroConfig.isBreak
+                                                        ? "Break"
+                                                        : "Focus"
+                                                    : ""
+                                            }
                                         />
                                     ) : (
                                         <div className="flex flex-col justify-center items-center w-1/2">
-                                            <AnalogClock time={timerMode === 'stopwatch' ? elapsedTime : timeLeft} />
+                                            <AnalogClock
+                                                time={
+                                                    timerMode === "stopwatch"
+                                                        ? elapsedTime
+                                                        : timeLeft
+                                                }
+                                            />
                                         </div>
                                     )
                                 ) : clockType === "digital" ? (
@@ -239,7 +358,13 @@ export default function TimerOverlay() {
                                     <Switch
                                         color="default"
                                         checked={clockType === "digital"}
-                                        onChange={() => setClockType((prev) => (prev === "digital" ? "analog" : "digital"))}
+                                        onChange={() =>
+                                            setClockType((prev) =>
+                                                prev === "digital"
+                                                    ? "analog"
+                                                    : "digital",
+                                            )
+                                        }
                                     />
                                 }
                                 label="Analog | Digital"
@@ -272,7 +397,9 @@ export default function TimerOverlay() {
                             {!isActive && (
                                 <Tooltip title="Start Timer">
                                     <button
-                                        disabled={duration === 0 || category === ""}
+                                        disabled={
+                                            duration === 0 || category === ""
+                                        }
                                         onClick={handleStart}
                                         className={`p-2 rounded shadow-lg ${duration === 0 || category === "" ? "bg-gray-400 text-gray-600" : "bg-[var(--accent)] text-white"}`}
                                     >
@@ -282,21 +409,30 @@ export default function TimerOverlay() {
                             )}
                             {isActive && !isPaused && (
                                 <Tooltip title="Pause Timer">
-                                    <button onClick={handlePause} className="p-2 bg-[var(--accent)] text-white rounded shadow-lg">
+                                    <button
+                                        onClick={handlePause}
+                                        className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
+                                    >
                                         <PauseIcon />
                                     </button>
                                 </Tooltip>
                             )}
                             {isActive && isPaused && (
                                 <Tooltip title="Resume Timer">
-                                    <button onClick={handleResume} className="p-2 bg-[var(--accent)] text-white rounded shadow-lg">
+                                    <button
+                                        onClick={handleResume}
+                                        className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
+                                    >
                                         <PlayArrowIcon />
                                     </button>
                                 </Tooltip>
                             )}
                             {isActive && (
                                 <Tooltip title="Stop Timer">
-                                    <button onClick={handleStop} className="p-2 bg-none border-2 border-[var(--accent)] text-white rounded shadow-lg">
+                                    <button
+                                        onClick={handleStop}
+                                        className="p-2 bg-none border-2 border-[var(--accent)] text-white rounded shadow-lg"
+                                    >
                                         <StopIcon />
                                     </button>
                                 </Tooltip>
