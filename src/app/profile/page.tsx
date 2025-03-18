@@ -12,7 +12,7 @@ export default function ProfileClient() {
   if (error) return <div>{error.message}</div>;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen w-full">
+    <div className="flex flex-col items-center justify-center min-h-screen w-full bg-[var(--background)] rounded">
       {user && (
         <Paper className="p-10 text-center flex flex-col justify-center w-auto min-w-1/2 items-cente rounded-lg shadow-lg text-2xl h-auto text-black gap-4">
           <h1 className="text-4xl">Welcome, {user.nickname ?? user.name}!</h1>

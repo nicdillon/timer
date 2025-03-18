@@ -108,7 +108,7 @@ export default function AnalyticsPage() {
 
   if (isLoading)
     return (
-      <div className="flex flex-col items-center justify-center h-screen w-full">
+      <div className="flex flex-col items-center justify-center h-full w-full bg-[var(--background)] rounded">
         <h1 className="text-3xl font-bold mb-4 text-white">
           Your Focus Sessions
         </h1>
@@ -119,14 +119,14 @@ export default function AnalyticsPage() {
 
   if (error)
     return (
-      <div className="p-5 flex flex-col items-center justify-center h-screen w-full">
+      <div className="p-5 flex flex-col items-center justify-center h-full w-full bg-[var(--background)] rounded">
         <h1 className="text-3xl font-bold mb-4">Your Focus Sessions</h1>
         <p className="text-red-500">{error}</p>
       </div>
     );
 
   return (
-    <div className="p-4 flex flex-col items-center justify-center min-h-screen w-full">
+    <div className="p-4 flex flex-col items-center justify-center h-full w-full bg-[var(--background)] rounded">
       <div className="flex flex-row justify-between items-stretch w-full mb-6">
         <h1 className="text-6xl font-bold mb-4 w-full items-start px-4">
           Analytics

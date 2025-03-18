@@ -28,7 +28,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
       className={`flex flex-col w-full justify-center items-start ${pathname === "/" || pathname === "" ? "" : "p-2 pl-0"} bg-[var(--foreground)]`}
     >
       <main className="flex-grow w-full">{children}</main>
-      <TimerOverlay />
+      {/* <TimerOverlay /> */}
     </div>
   );
 }

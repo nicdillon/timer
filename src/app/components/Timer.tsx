@@ -9,9 +9,9 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import StopIcon from "@mui/icons-material/Stop";
 import { usePathname } from "next/navigation";
-import { useTimer } from "./TimerContext";
+import { useTimer } from "../TimerContext";
 
-export default function TimerOverlay() {
+export default function Timer() {
     const [hasMounted, setHasMounted] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
     const pathname = usePathname();
@@ -33,10 +33,10 @@ export default function TimerOverlay() {
         handleCategoryChange,
         formatTime,
         timerMode,
-        handleTimerModeChange,
+        setTimerMode,
         elapsedTime,
         pomodoroConfig,
-        handlePomodoroConfigChange,
+        setPomodoroConfig,
         overlayPosition,
         setOverlayPosition,
     } = useTimer();
@@ -51,69 +51,16 @@ export default function TimerOverlay() {
         }
     }, [pathname]);
 
-    const computeOverlaySize = () => {
-        if (typeof window !== "undefined") {
-            if (isMinimized) {
-                return { width: 60, height: 60 };
-            }
-
-            let width: number, height: number;
-            if (isTimerPage) {
-                width =
-                    document.documentElement.clientWidth < 600
-                        ? document.documentElement.clientWidth * 0.9
-                        : 400;
-                height =
-                    document.documentElement.clientHeight < 600
-                        ? document.documentElement.clientHeight * 0.5
-                        : 400;
-            } else {
-                width =
-                    document.documentElement.clientWidth < 600
-                        ? document.documentElement.clientWidth * 0.7
-                        : 250;
-                height =
-                    document.documentElement.clientHeight < 600
-                        ? document.documentElement.clientHeight * 0.3
-                        : 250;
-            }
-            return { width, height };
-        } else {
-            return { width: 0, height: 0 };
-        }
-    };
-
-    useEffect(() => {
-        const handleResize = () => {
-            setOverlaySize(computeOverlaySize());
-        };
-        setOverlaySize(computeOverlaySize());
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, [isTimerPage, isMinimized]);
+    // useEffect(() => {
+    //     // const handleResize = () => {
+    //     //     setOverlaySize(computeOverlaySize());
+    //     // };
+    //     // setOverlaySize(computeOverlaySize());
+    //     // window.addEventListener("resize", handleResize);
+    //     // return () => window.removeEventListener("resize", handleResize);
+    // }, [isTimerPage, isMinimized]);
 
     if (!hasMounted) return null;
-
-    const computeTargetPosition = () => {
-        if (isTimerPage) {
-            return {
-                x: document.documentElement.clientWidth / 2,
-                y: document.documentElement.clientHeight / 2,
-            };
-        } else {
-            return {
-                x:
-                    document.documentElement.clientWidth < 600
-                        ? (document.documentElement.clientWidth -
-                              overlaySize.width) /
-                          2
-                        : document.documentElement.clientWidth / 2 - 10,
-                y: document.documentElement.clientHeight / 2 - 10,
-            };
-        }
-    };
-
-    const targetPosition = computeTargetPosition();
 
     function DigitalClock({ time, label }: { time: number; label?: string }) {
         return (
@@ -126,7 +73,10 @@ export default function TimerOverlay() {
     }
 
     function AnalogClock({ time }: { time: number }) {
-        const progress = time / (duration * 60);
+        let progress = time / (duration * 60);
+        if (timerMode === "stopwatch") {
+            progress = elapsedTime / 3600;
+        }
         const radius = 50;
         const circumference = 2 * Math.PI * radius;
         const offset = circumference * (1 - progress);
@@ -196,15 +146,21 @@ export default function TimerOverlay() {
         return (
             <div className="mb-4 flex flex-row gap-2">
                 <button
-                    className="rounded border-1 border-[var(--accent)] shadow-lg bg-none"
-                    onClick={() => handleTimerModeChange("standard")}
+                    className={`p-2 rounded ${timerMode === "timer" ? "border-none text-white bg-[var(--accent)]" : "border border-[var(--accent)]"}  bg-none shadow-lg  rounded`}
+                    onClick={() => setTimerMode("timer")}
                 >
                     Standard
                 </button>
-                <button onClick={() => handleTimerModeChange("stopwatch")}>
+                <button
+                    className={`p-2 rounded ${timerMode === "stopwatch" ? "border-none text-white bg-[var(--accent)]" : "border border-[var(--accent)]"} shadow-lg rounded`}
+                    onClick={() => setTimerMode("stopwatch")}
+                >
                     Stopwatch
                 </button>
-                <button onClick={() => handleTimerModeChange("pomodoro")}>
+                <button
+                    className={`p-2 rounded ${timerMode === "pomodoro" ? "border-none text-white bg-[var(--accent)]" : "border border-[var(--accent)]"} shadow-lg rounded`}
+                    onClick={() => setTimerMode("pomodoro")}
+                >
                     Pomodoro
                 </button>
             </div>
@@ -213,50 +169,56 @@ export default function TimerOverlay() {
 
     const renderPomodoroConfig = () => {
         return (
-            <div>
-                <label>
-                    Focus Time:
-                    <input
-                        type="number"
-                        value={pomodoroConfig.focusTime}
-                        onChange={(e) =>
-                            handlePomodoroConfigChange(
-                                "focusTime",
-                                parseInt(e.target.value, 10),
-                            )
+            <div className="flex flex-col w-auto h-auto justify-center items-center gap-4">
+                <input
+                    placeholder="Focus Time"
+                    type="number"
+                    className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
+                    value={pomodoroConfig.focusTime}
+                    onChange={(e) => {
+                        if (e.target.value === "") {
+                            setPomodoroConfig("focusTime", 10);
+                            handleDurationChange(0);
+                            return;
                         }
-                    />
-                </label>
-                <label>
-                    Break Time:
-                    <input
-                        type="number"
-                        value={pomodoroConfig.breakTime}
-                        onChange={(e) =>
-                            handlePomodoroConfigChange(
-                                "breakTime",
-                                parseInt(e.target.value, 10),
-                            )
+                        setPomodoroConfig(
+                            "focusTime",
+                            parseInt(e.target.value, 10),
+                        );
+                        handleDurationChange(parseInt(e.target.value, 10));
+                    }}
+                />
+
+                <input
+                    placeholder="Break Time"
+                    type="number"
+                    className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
+                    value={pomodoroConfig.breakTime}
+                    onChange={(e) => {
+                        if (e.target.value === "") {
+                            setPomodoroConfig("breakTime", 5);
+                            // handleDurationChange(0);
+                            return;
                         }
-                    />
-                </label>
+                        setPomodoroConfig(
+                            "breakTime",
+                            parseInt(e.target.value, 5),
+                        );
+                        // handleDurationChange(pomodoroConfig.focusTime * 60);
+                    }}
+                />
             </div>
         );
     };
 
-    if (!isActive && !isTimerPage) return <div></div>;
-
     return (
         <motion.div
             layout
-            initial={{ x: overlayPosition.x, y: overlayPosition.y }}
-            animate={targetPosition}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed z-45 h-auto w-auto"
-            onAnimationComplete={() => setOverlayPosition(targetPosition)}
+            style={{ width: auto, height: auto }}
+            className={`z-45 h-full w-full flex justify-center items-center ${isMinimized ? "hidden" : ""}`}
         >
             <div
-                className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-full flex flex-col items-center justify-center ${!isTimerPage && isMinimized ? "cursor-pointer" : ""}`}
+                className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-auto flex flex-col items-center justify-center ${!isTimerPage && isMinimized ? "cursor-pointer" : ""}`}
                 onClick={() =>
                     !isTimerPage && isMinimized && setIsMinimized(false)
                 }
@@ -305,11 +267,10 @@ export default function TimerOverlay() {
                         </svg>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center h-full w-full justify-center">
-                        <div className="mb-2 w-full flex flex-col items-center justify-center">
-                            {renderModeSelector()}
-                            {timerMode === "pomodoro" && renderPomodoroConfig()}
-                            <div className="mb-4">
+                    <div className="flex flex-col items-center h-auto w-auto justify-center">
+                        <div className="mb-2 w-auto flex flex-col items-center justify-center">
+                            {!isActive && renderModeSelector()}
+                            <div className="mb-4 w-full flex justify-center items-center">
                                 {isActive ? (
                                     clockType === "digital" ? (
                                         <DigitalClock
@@ -327,7 +288,7 @@ export default function TimerOverlay() {
                                             }
                                         />
                                     ) : (
-                                        <div className="flex flex-col justify-center items-center w-1/2">
+                                        <div className="flex flex-col justify-center items-center w-auto">
                                             <AnalogClock
                                                 time={
                                                     timerMode === "stopwatch"
@@ -338,10 +299,22 @@ export default function TimerOverlay() {
                                         </div>
                                     )
                                 ) : clockType === "digital" ? (
-                                    <DigitalClock time={timeLeft} />
+                                    <DigitalClock
+                                        time={
+                                            timerMode === "stopwatch"
+                                                ? elapsedTime
+                                                : timeLeft
+                                        }
+                                    />
                                 ) : (
-                                    <div className="flex flex-col justify-center items-center w-1/2">
-                                        <AnalogClock time={timeLeft} />
+                                    <div className="flex flex-col justify-center items-center w-auto">
+                                        <AnalogClock
+                                            time={
+                                                timerMode === "stopwatch"
+                                                    ? elapsedTime
+                                                    : timeLeft
+                                            }
+                                        />
                                     </div>
                                 )}
                             </div>
@@ -368,24 +341,42 @@ export default function TimerOverlay() {
                                 <Tooltip title="Enter a category" arrow>
                                     <input
                                         type="text"
+                                        placeholder="Category"
                                         value={category}
                                         onChange={handleCategoryChange}
-                                        placeholder="Category"
                                         className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
                                     />
                                 </Tooltip>
-                                <Tooltip title="Set duration" arrow>
-                                    <input
-                                        type="number"
-                                        value={duration === 0 ? "" : duration}
-                                        onChange={handleDurationChange}
-                                        className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
-                                        min="1"
-                                    />
-                                </Tooltip>
+                                {timerMode === "timer" && (
+                                    <Tooltip title="Set duration" arrow>
+                                        <input
+                                            type="number"
+                                            value={
+                                                duration === 0 ? "" : duration
+                                            }
+                                            onChange={(e) => {
+                                                if (e.target.value === "") {
+                                                    handleDurationChange(0);
+                                                    return;
+                                                }
+                                                const newDuration = parseInt(
+                                                    e.target.value,
+                                                    25,
+                                                );
+                                                handleDurationChange(
+                                                    newDuration,
+                                                );
+                                            }}
+                                            className="text-white text-lg p-1 border-2 border-[var(--accent)] rounded w-full bg-transparent text-center focus:outline-none focus:border-[var(--accent)] shadow-lg"
+                                            min="1"
+                                        />
+                                    </Tooltip>
+                                )}
+                                {timerMode === "pomodoro" &&
+                                    renderPomodoroConfig()}
                             </div>
                         )}
-                        <div className="flex gap-1">
+                        <div className="flex flex-row gap-1">
                             {!isActive && (
                                 <Tooltip title="Start Timer">
                                     <button
@@ -393,7 +384,7 @@ export default function TimerOverlay() {
                                             duration === 0 || category === ""
                                         }
                                         onClick={handleStart}
-                                        className={`p-2 rounded shadow-lg ${duration === 0 || category === "" ? "bg-gray-400 text-gray-600" : "bg-[var(--accent)] text-white"}`}
+                                        className={`p-2 rounded shadow-lg w-12 ${duration === 0 || category === "" ? "bg-gray-400 text-gray-600" : "bg-[var(--accent)] text-white"}`}
                                     >
                                         <PlayArrowIcon />
                                     </button>
@@ -403,7 +394,7 @@ export default function TimerOverlay() {
                                 <Tooltip title="Pause Timer">
                                     <button
                                         onClick={handlePause}
-                                        className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
+                                        className="p-2 bg-[var(--accent)] text-white w-12 rounded shadow-lg"
                                     >
                                         <PauseIcon />
                                     </button>
@@ -413,7 +404,7 @@ export default function TimerOverlay() {
                                 <Tooltip title="Resume Timer">
                                     <button
                                         onClick={handleResume}
-                                        className="p-2 bg-[var(--accent)] text-white rounded shadow-lg"
+                                        className="p-2 bg-[var(--accent)] text-white w-12 rounded shadow-lg"
                                     >
                                         <PlayArrowIcon />
                                     </button>
@@ -423,7 +414,7 @@ export default function TimerOverlay() {
                                 <Tooltip title="Stop Timer">
                                     <button
                                         onClick={handleStop}
-                                        className="p-2 bg-none border-2 border-[var(--accent)] text-white rounded shadow-lg"
+                                        className="p-2 bg-none border-2 w-12 border-[var(--accent)] text-white rounded shadow-lg"
                                     >
                                         <StopIcon />
                                     </button>

@@ -19,8 +19,8 @@ interface TimerContextProps {
   isActive: boolean;
   isPaused: boolean;
   category: string;
-  timerMode: 'timer' | 'stopwatch' | 'pomodoro';
-  setTimerMode: (mode: 'timer' | 'stopwatch' | 'pomodoro') => void;
+  timerMode: "timer" | "stopwatch" | "pomodoro";
+  setTimerMode: (mode: "timer" | "stopwatch" | "pomodoro") => void;
   pomodoroConfig: {
     focusTime: number;
     breakTime: number;
@@ -32,7 +32,7 @@ interface TimerContextProps {
   handlePause: () => void;
   handleResume: () => void;
   handleStop: () => void;
-  handleDurationChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleDurationChange: (number) => void;
   handleCategoryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   formatTime: (seconds: number) => string;
 }
@@ -79,7 +79,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
       }
       return {
         x: document.documentElement.clientWidth / 2,
-        y: document.documentElement.clientHeight,
+        y: document.documentElement.clientHeight / 2,
       };
     },
   );
@@ -87,8 +87,10 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [category, setCategory] = useState("Category");
-  const [timerMode, setTimerMode] = useState<'timer' | 'stopwatch' | 'pomodoro'>('timer');
+  const [category, setCategory] = useState("Focus");
+  const [timerMode, setTimerMode] = useState<
+    "timer" | "stopwatch" | "pomodoro"
+  >("timer");
   const [pomodoroConfig, setPomodoroConfig] = useState({
     focusTime: 25,
     breakTime: 5,
@@ -148,7 +150,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
             return 0;
           }
         });
-        setElapsedTime(prevTime => prevTime + 1);
+        setElapsedTime((prevTime) => prevTime + 1);
       }, 1000);
     }
     return () => {
@@ -156,7 +158,6 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, isPaused]);
-
 
   const handleStart = () => {
     setIsActive(true);
@@ -209,13 +210,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     setElapsedTime(0);
   };
 
-  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value === "") {
-      setDuration(0);
-      setTimeLeft(0);
-      return;
-    }
-    const newDuration = parseInt(e.target.value);
+  const handleDurationChange = (newDuration) => {
     setDuration(newDuration);
     setTimeLeft(newDuration * 60);
   };
@@ -234,12 +229,18 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     if (hasFinished.current) return;
     hasFinished.current = true;
 
-    setTimeLeft(duration * 60);
+    if (timerMode === "pomodoro") {
+      if (pomodorConfig.isBreak) {
+        setTimeLeft(pomodoroConfig.break * 60);
+        setPomodoroConfig({ isBreak: true });
+      }
+    } else {
+      setTimeLeft(duration * 60);
+      setIsActive(false);
+    }
 
     const audio = new Audio("/alarm.wav");
     audio.play();
-
-    setIsActive(false);
 
     if (isLoading) return;
 
