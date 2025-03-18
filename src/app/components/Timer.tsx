@@ -213,8 +213,6 @@ export default function Timer() {
 
     return (
         <motion.div
-            layout
-            style={{ width: auto, height: auto }}
             className={`z-45 h-full w-full flex justify-center items-center ${isMinimized ? "hidden" : ""}`}
         >
             <div

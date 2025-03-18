@@ -108,7 +108,7 @@ export default function AnalyticsPage() {
 
   if (isLoading)
     return (
-      <div className="flex flex-col items-center justify-center h-full w-full bg-[var(--background)] rounded">
+      <div className="flex flex-col items-center justify-center h-full w-full bg-[var(--background)] md:rounded">
         <h1 className="text-3xl font-bold mb-4 text-white">
           Your Focus Sessions
         </h1>

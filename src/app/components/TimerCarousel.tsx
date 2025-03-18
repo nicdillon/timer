@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -17,7 +16,7 @@ export default function TimerCarousel() {
   };
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full flex justify-center items-center">
       {/* Desktop View */}
       <div className="hidden md:flex justify-center items-center gap-4 p-4">
         {modes.map((mode, index) => (
