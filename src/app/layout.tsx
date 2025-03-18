@@ -22,8 +22,8 @@ function LayoutContent({ children }: { children: ReactNode }) {
   // Now always include TimerOverlay so it can animate between positions.
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
-      <main className="flex-grow md:ml-1/4">{children}</main>
+    <div className="flex flex-col w-full justify-center items-start">
+      <main className="flex-grow w-full">{children}</main>
       <TimerOverlay />
     </div>
   );
@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <body className="min-h-screen flex flex-row w-screen">
             <TimerProvider>
               <nav
-                className={`p-4 ${pathname === "/" ? "hidden" : "flex"} sticky md:w-20 top-0 h-full md:border-r border-gray-700 md:h-screen flex-col md:gap-4 md:bg-none md:shadow-lg md:backdrop-blur-none z-50 ${menuOpen ? "bg-white  backdrop-blur-md shadow-lg" : ""}`}
+                className={`p-4 ${pathname === "/" ? "hidden" : "flex"} sticky md:w-20 top-0 h-screen md:border-r border-[var(--accent)] md:h-screen flex-col md:gap-4 md:bg-white md:shadow-lg md:backdrop-blur-md z-50 ${menuOpen ? "bg-white  backdrop-blur-md shadow-lg" : ""}`}
               >
                 {/* <img src='/TIMERLogo.svg' className='w-auto h-16 object-conatain' height={64} width={64}></img> */}
                 <div className="flex justify-between items-center md:hidden">
@@ -76,21 +76,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     className="text-[var(--accent)] focus:outline-none"
                   >
                     {menuOpen ? (
-                      <CloseIcon fontSize="large" />
+                      <div></div> // <CloseIcon fontSize="large" />
                     ) : (
                       <MenuIcon fontSize="large" />
                     )}
                   </button>
                 </div>
                 <ul
-                  className={`flex md:flex-col md:gap-4 w-auto h-full md:flex ${menuOpen ? "flex" : "hidden"}`}
+                  className={`flex flex-col md:flex-col md:gap-4 w-auto h-full md:flex ${menuOpen ? "flex" : "hidden"}`}
                 >
                   <li className="mb-2 md:mb-0">
                     <Link
                       href="/timer"
                       title="Timer"
                       onClick={() => setMenuOpen(false)}
-                      className={`flex justify-center items-center ${pathname === "/timer" ? "text-[var(--background)] bg-[var(--foreground)]" : "text-[var(--foreground)] bg-none"} hover:text-[var(--accent)] border border-none rounded p-1 text-center backdrop-blur-md shadow-lg`}
+                      className={`flex justify-center items-center ${pathname !== "/timer" ? "text-[var(--background)]" : "text-[var(--accent)] bg-none"} hover:text-[var(--accent)] border border-none rounded p-1 text-center backdrop-blur-md shadow-lg`}
                     >
                       <TimerIcon fontSize="large" />
                     </Link>
@@ -100,7 +100,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       href="/analytics"
                       onClick={() => setMenuOpen(false)}
                       title="Analytics"
-                      className={`flex justify-center items-center ${pathname === "/analytics" ? "text-black bg-white" : "text-white bg-none"}  hover:text-[var(--accent)] border border-none rounded p-1 text-center  backdrop-blur-md shadow-lg`}
+                      className={`flex justify-center items-center ${pathname !== "/analytics" ? "text-black bg-white" : "text-[var(--accent)] bg-none"}  hover:text-[var(--accent)] border border-none rounded p-1 text-center  backdrop-blur-md shadow-lg`}
                     >
                       <AssessmentIcon fontSize="large" />
                     </Link>
@@ -115,7 +115,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       href="/profile"
                       onClick={() => setMenuOpen(false)}
                       title="Profile"
-                      className={`flex justify-center items-center ${pathname === "/profile" ? "text-black bg-white" : "text-white bg-none"}  hover:text-[var(--accent)] border border-none rounded p-1 text-center   backdrop-blur-md shadow-lg`}
+                      className={`flex justify-center items-center ${pathname !== "/profile" ? "text-black bg-white" : "text-[var(--accent)] bg-none"}  hover:text-[var(--accent)] border border-none rounded p-1 text-center   backdrop-blur-md shadow-lg`}
                     >
                       <AccountBoxIcon fontSize="large" />
                     </Link>
@@ -126,7 +126,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   href="/api/auth/logout"
                   onClick={() => setMenuOpen(false)}
                   title="Logout"
-                  className={`flex justify-center items-center 'text-white bg-none'  hover:text-[var(--accent)] border border-none rounded p-1 text-center   backdrop-blur-md shadow-lg`}
+                  className={`md:flex justify-center items-center text-[var(--background)] ${menuOpen ? "block" : "hidden"} bg-none  hover:text-[var(--accent)] border border-none rounded p-1 text-center   backdrop-blur-md shadow-lg`}
                 >
                   <LogoutIcon fontSize="large" />
                 </Link>
