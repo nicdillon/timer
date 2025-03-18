@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Tooltip from "@mui/material/Tooltip";
 import Switch from "@mui/material/Switch";
@@ -9,153 +9,15 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import StopIcon from "@mui/icons-material/Stop";
 import { usePathname } from "next/navigation";
-
-// Timer Context
-const TimerContext = createContext();
-
-const useTimer = () => useContext(TimerContext);
-
-export const TimerProvider = ({ children }) => {
-    const [timerMode, setTimerMode] = useState('standard'); // Added timer mode state
-    const [duration, setDuration] = useState(0);
-    const [timeLeft, setTimeLeft] = useState(0);
-    const [isActive, setIsActive] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
-    const [elapsedTime, setElapsedTime] = useState(0); // For stopwatch
-    const [category, setCategory] = useState('');
-    const [pomodoroConfig, setPomodoroConfig] = useState({ focusTime: 25, breakTime: 5, isBreak: false }); // Pomodoro config
-
-
-    const handleStart = () => {
-        setIsActive(true);
-        setIsPaused(false);
-        if (timerMode === 'pomodoro') {
-            setTimeLeft(pomodoroConfig.focusTime * 60);
-        } else if (timerMode === 'stopwatch'){
-            setElapsedTime(0);
-        } else {
-            setTimeLeft(duration * 60);
-        }
-        startTimer();
-    };
-
-    const handlePause = () => {
-        setIsPaused(true);
-        clearInterval(timer);
-    };
-
-    const handleResume = () => {
-        setIsPaused(false);
-        startTimer();
-    };
-
-    const handleStop = () => {
-        setIsActive(false);
-        setIsPaused(false);
-        clearInterval(timer);
-        setTimeLeft(0);
-        setElapsedTime(0); //Reset stopwatch
-    };
-
-    const handleDurationChange = (e) => {
-        setDuration(parseInt(e.target.value, 10) || 0);
-    };
-
-    const handleCategoryChange = (e) => {
-        setCategory(e.target.value);
-    };
-
-    const handlePomodoroConfigChange = (key, value) => {
-        setPomodoroConfig({ ...pomodoroConfig, [key]: value });
-    };
-
-    const handleTimerModeChange = (mode) => {
-        setTimerMode(mode);
-        handleStop(); // Stop current timer when switching modes
-    };
-
-    let timer;
-    const startTimer = () => {
-        timer = setInterval(() => {
-            if (timerMode === 'stopwatch') {
-                setElapsedTime((prev) => prev + 1);
-            } else if (timerMode === 'pomodoro' && timeLeft > 0 && !isPaused) {
-                setTimeLeft((prev) => prev - 1);
-                if (timeLeft <= 0) {
-                    handlePomodoroCycleComplete();
-                }
-            } else if (timeLeft > 0 && !isPaused) {
-                setTimeLeft((prev) => prev - 1);
-            } else if (timeLeft <=0 && !isPaused){
-                handleStop();
-            }
-        }, 1000);
-    };
-
-    const handlePomodoroCycleComplete = () => {
-        clearInterval(timer);
-        setPomodoroConfig({...pomodoroConfig, isBreak: !pomodoroConfig.isBreak});
-        if(pomodoroConfig.isBreak){
-            setTimeLeft(pomodoroConfig.breakTime * 60);
-        } else {
-            setTimeLeft(pomodoroConfig.focusTime * 60);
-        }
-        setIsPaused(false);
-        startTimer();
-    };
-
-    const formatTime = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-    };
-
-    const value = {
-        timerMode,
-        duration,
-        timeLeft,
-        isActive,
-        isPaused,
-        elapsedTime,
-        category,
-        pomodoroConfig,
-        handleStart,
-        handlePause,
-        handleResume,
-        handleStop,
-        handleDurationChange,
-        handleCategoryChange,
-        handlePomodoroConfigChange,
-        handleTimerModeChange,
-        formatTime,
-    };
-
-    return (
-        <TimerContext.Provider value={value}>
-            {children}
-        </TimerContext.Provider>
-    );
-};
-
-
 import { useTimer } from "./TimerContext";
-import { useTimerContext } from "./TimerContext"; //This might need adjustment based on your folder structure
 
 export default function TimerOverlay() {
     const [hasMounted, setHasMounted] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
     const pathname = usePathname();
-
-    useEffect(() => {
-        setHasMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (pathname === "/timer") {
-            setIsMinimized(false);
-        }
-    }, [pathname]);
-
+    const [clockType, setClockType] = useState<"digital" | "analog">("digital");
+    const [overlaySize, setOverlaySize] = useState({ width: 200, height: 200 });
+    const isTimerPage = pathname === "/timer";
 
     const {
         duration,
@@ -175,11 +37,19 @@ export default function TimerOverlay() {
         elapsedTime,
         pomodoroConfig,
         handlePomodoroConfigChange,
+        overlayPosition,
+        setOverlayPosition
     } = useTimer();
 
-    const { overlayPosition, setOverlayPosition } = useTimerContext();
-    const [overlaySize, setOverlaySize] = useState({ width: 200, height: 200 });
-    const isTimerPage = pathname === "/timer";
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (pathname === "/timer") {
+            setIsMinimized(false);
+        }
+    }, [pathname]);
 
     const computeOverlaySize = () => {
         if (typeof window !== "undefined") {
@@ -210,8 +80,6 @@ export default function TimerOverlay() {
         return () => window.removeEventListener("resize", handleResize);
     }, [isTimerPage, isMinimized]);
 
-    const [clockType, setClockType] = useState<"digital" | "analog">("digital");
-
     if (!hasMounted) return null;
 
     const computeTargetPosition = () => {
@@ -239,7 +107,7 @@ export default function TimerOverlay() {
     }
 
     function AnalogClock({ time }: { time: number }) {
-        const progress = time / (duration * 60); //Adjust for different modes if necessary. Consider using a max time for stopwatch.
+        const progress = time / (duration * 60);
         const radius = 50;
         const circumference = 2 * Math.PI * radius;
         const offset = circumference * (1 - progress);
@@ -287,16 +155,23 @@ export default function TimerOverlay() {
             <div>
                 <label>
                     Focus Time:
-                    <input type="number" value={pomodoroConfig.focusTime} onChange={(e) => handlePomodoroConfigChange('focusTime', parseInt(e.target.value, 10))} />
+                    <input 
+                        type="number" 
+                        value={pomodoroConfig.focusTime} 
+                        onChange={(e) => handlePomodoroConfigChange('focusTime', parseInt(e.target.value, 10))} 
+                    />
                 </label>
                 <label>
                     Break Time:
-                    <input type="number" value={pomodoroConfig.breakTime} onChange={(e) => handlePomodoroConfigChange('breakTime', parseInt(e.target.value, 10))} />
+                    <input 
+                        type="number" 
+                        value={pomodoroConfig.breakTime} 
+                        onChange={(e) => handlePomodoroConfigChange('breakTime', parseInt(e.target.value, 10))} 
+                    />
                 </label>
             </div>
         );
     };
-
 
     if (!isActive && !isTimerPage) return <div></div>;
 
@@ -342,7 +217,10 @@ export default function TimerOverlay() {
                             <div className="mb-4">
                                 {isActive ? (
                                     clockType === "digital" ? (
-                                        <DigitalClock time={timerMode === 'stopwatch' ? elapsedTime : timeLeft} label={timerMode === 'pomodoro' ? (pomodoroConfig.isBreak ? 'Break' : 'Focus') : ''} />
+                                        <DigitalClock 
+                                            time={timerMode === 'stopwatch' ? elapsedTime : timeLeft} 
+                                            label={timerMode === 'pomodoro' ? (pomodoroConfig.isBreak ? 'Break' : 'Focus') : ''} 
+                                        />
                                     ) : (
                                         <div className="flex flex-col justify-center items-center w-1/2">
                                             <AnalogClock time={timerMode === 'stopwatch' ? elapsedTime : timeLeft} />
