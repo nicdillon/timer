@@ -19,11 +19,19 @@ interface TimerContextProps {
   isActive: boolean;
   isPaused: boolean;
   category: string;
+  timerMode: 'timer' | 'stopwatch' | 'pomodoro';
+  setTimerMode: (mode: 'timer' | 'stopwatch' | 'pomodoro') => void;
+  pomodoroConfig: {
+    focusTime: number;
+    breakTime: number;
+    isBreak: boolean;
+  };
+  setPomodoroConfig: (config: { focusTime: number; breakTime: number }) => void;
+  elapsedTime: number;
   handleStart: () => void;
   handlePause: () => void;
   handleResume: () => void;
   handleStop: () => void;
-  // handleTest: () => void;
   handleDurationChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleCategoryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   formatTime: (seconds: number) => string;
@@ -80,6 +88,13 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [category, setCategory] = useState("Category");
+  const [timerMode, setTimerMode] = useState<'timer' | 'stopwatch' | 'pomodoro'>('timer');
+  const [pomodoroConfig, setPomodoroConfig] = useState({
+    focusTime: 25,
+    breakTime: 5,
+    isBreak: false,
+  });
+  const [elapsedTime, setElapsedTime] = useState(0);
   const hasFinished = useRef(false);
   const { user, isLoading, error } = useUser();
 
@@ -133,6 +148,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
             return 0;
           }
         });
+        setElapsedTime(prevTime => prevTime + 1);
       }, 1000);
     }
     return () => {
@@ -141,21 +157,6 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, isPaused]);
 
-  // const handleTest = () => {
-  //   console.log('Test');
-  //   // Set a very short duration for testing (duration in minutes)
-  //   // Here we set duration to a fraction (e.g. 0.1 minute = 6 seconds), and force time left to 1 second for rapid testing.
-  //   setDuration(0.1);
-  //   setTimeLeft(1);
-  //   setIsActive(true);
-  //   setIsPaused(false);
-  //   hasFinished.current = false;
-
-  //   // After a short delay, trigger the timer finish logic
-  //   setTimeout(() => {
-  //     handleTimerFinish();
-  //   }, 100); // 100ms delay
-  // };
 
   const handleStart = () => {
     setIsActive(true);
@@ -205,6 +206,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     setIsActive(false);
     setIsPaused(false);
     setTimeLeft(duration * 60);
+    setElapsedTime(0);
   };
 
   const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -294,6 +296,11 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
         isActive,
         isPaused,
         category,
+        timerMode,
+        setTimerMode,
+        pomodoroConfig,
+        setPomodoroConfig,
+        elapsedTime,
         handleStart,
         handlePause,
         handleResume,
@@ -301,7 +308,6 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
         handleDurationChange,
         handleCategoryChange,
         formatTime,
-        // handleTest,
       }}
     >
       {children}
