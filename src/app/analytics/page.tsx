@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../AuthContext";
+import { DEMO_SESSIONS } from "../lib/demoData";
+import LoginCTA from "../components/LoginCTA";
 import {
   Table,
   TableBody,
@@ -28,16 +31,21 @@ import {
 } from "../lib/aggregateStatistics";
 
 export default function AnalyticsPage() {
+  const { user, isLoading: authLoading } = useAuth();
   const [sessions, setSessions] = useState<FocusSession[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isTableExpanded, setIsTableExpanded] = useState<boolean>(false);
-  const dataByCategory = aggregateTimeByCategory(sessions);
-  const sessionsByCategory = aggregateSessionsByCategory(sessions);
-  const dataByDay = aggregateByDay(sessions);
-  const dataByDuration = aggregateByDuration(sessions);
-  const dataLast7Days = aggregateLast7Days(sessions);
-  const totalFocusTime = calculateTotalFocusTime(sessions);
+  
+  // Use demo data for anonymous users
+  const displaySessions = user ? sessions : DEMO_SESSIONS;
+  
+  const dataByCategory = aggregateTimeByCategory(displaySessions);
+  const sessionsByCategory = aggregateSessionsByCategory(displaySessions);
+  const dataByDay = aggregateByDay(displaySessions);
+  const dataByDuration = aggregateByDuration(displaySessions);
+  const dataLast7Days = aggregateLast7Days(displaySessions);
+  const totalFocusTime = calculateTotalFocusTime(displaySessions);
 
   // Pagination state.
   const [page, setPage] = useState(0);
@@ -106,7 +114,7 @@ export default function AnalyticsPage() {
     return { hours: (totalFocusTime / 60) | 0, minutes: totalFocusTime % 60 };
   }
 
-  if (isLoading)
+  if (isLoading || authLoading)
     return (
       <div className="flex flex-col items-center justify-center h-full w-full bg-[var(--background)] md:rounded">
         <h1 className="text-3xl font-bold mb-4 text-white">
@@ -126,7 +134,7 @@ export default function AnalyticsPage() {
     );
 
   return (
-    <div className="p-4 flex flex-col items-center justify-center h-full w-full bg-[var(--background)] rounded">
+    <div className="p-4 flex flex-col items-center justify-start h-full w-full bg-[var(--background)] rounded">
       <div className="flex flex-row justify-between items-stretch w-full mb-6">
         <h1 className="text-6xl font-bold mb-4 w-full items-start px-4">
           Analytics
@@ -149,8 +157,15 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
+      {/* Show login CTA for anonymous users */}
+      {!user && (
+        <div className="mb-6 w-full">
+          <LoginCTA message="Sign up or log in to track and save your own focus sessions. The data below is demo data." />
+        </div>
+      )}
+      
       {/* Charts section */}
-      {sessions && sessions.length > 0 ? (
+      {displaySessions && displaySessions.length > 0 ? (
         <div className="flex flex-wrap justify-center gap-2 mb-5">
           <Paper className="p-3 bg-none flex flex-wrap flex-col gap-4">
             <h2 className="text-2xl text-left mb-2">Focus Time</h2>
@@ -335,7 +350,7 @@ export default function AnalyticsPage() {
           </Paper>
         </div>
       ) : (
-        <p className="text-lg text-gray-700">No focus sessions found.</p>
+        <p className="text-lg text-gray-700 h-full text-center justify-center">No focus sessions found.</p>
       )}
       {/* The table displaying individual focus sessions */}
       {sessions && sessions.length > 0 && !isTableExpanded && (

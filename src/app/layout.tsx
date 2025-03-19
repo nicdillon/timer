@@ -1,20 +1,17 @@
 "use client";
 
-import { UserProvider } from "@auth0/nextjs-auth0/client";
+import { AuthProvider } from "./AuthContext";
 import "./globals.css";
 import Link from "next/link";
 import Head from "next/head";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
-// import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import TimerIcon from "@mui/icons-material/Timer";
-import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import TimerProvider from "./TimerContext";
-import TimerOverlay from "./TimerOverlay";
 import Theme from "./lib/theme";
 import { ThemeProvider } from "@mui/material/styles";
 
@@ -25,7 +22,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className={`flex flex-col w-full justify-center items-start ${pathname === "/" || pathname === "" ? "" : "md:p-2 pl-0"} bg-[var(--foreground)]`}
+      className={`flex flex-col w-full justify-center items-start ${pathname === "/" || pathname === "" ? "" : "md:p-2 md:shadow-lg pl-0"} bg-[var(--foreground)]`}
     >
       <main className="flex-grow w-full">{children}</main>
       {/* <TimerOverlay /> */}
@@ -65,7 +62,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           rel="stylesheet"
         ></link>
       </Head>
-      <UserProvider>
+      <AuthProvider>
         <ThemeProvider theme={Theme}>
           <body className="min-h-screen flex flex-row w-screen">
             <TimerProvider>
@@ -127,7 +124,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 </ul>
                 <Link
                   prefetch={false}
-                  href="/api/auth/logout"
+                  href="/api/auth/signout"
                   onClick={() => setMenuOpen(false)}
                   title="Logout"
                   className={`md:flex justify-center items-center text-[var(--background)] ${menuOpen ? "block" : "hidden"} bg-none  hover:text-[var(--accent)] border border-none rounded p-1 text-center   backdrop-blur-md shadow-lg`}
@@ -139,7 +136,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </TimerProvider>
           </body>
         </ThemeProvider>
-      </UserProvider>
+      </AuthProvider>
     </html>
   );
 }
