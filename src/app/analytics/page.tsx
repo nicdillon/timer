@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../AuthContext";
 import { DEMO_SESSIONS } from "../lib/demoData";
 import LoginCTA from "../components/LoginCTA";
 import {
@@ -29,17 +28,20 @@ import {
   aggregateLast7Days,
   aggregateSessionsByCategory,
 } from "../lib/aggregateStatistics";
+import { User } from '@supabase/supabase-js'
+import { getUser } from '../lib/supabaseClient'
+
 
 export default function AnalyticsPage() {
-  const { user, isLoading: authLoading } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
   const [sessions, setSessions] = useState<FocusSession[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isTableExpanded, setIsTableExpanded] = useState<boolean>(false);
-  
+
   // Use demo data for anonymous users
   const displaySessions = user ? sessions : DEMO_SESSIONS;
-  
+
   const dataByCategory = aggregateTimeByCategory(displaySessions);
   const sessionsByCategory = aggregateSessionsByCategory(displaySessions);
   const dataByDay = aggregateByDay(displaySessions);
@@ -54,6 +56,18 @@ export default function AnalyticsPage() {
   // Responsive chart width.
   const [chartWidth, setChartWidth] = useState(400);
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data, error } = await getUser();
+        if (error) throw error;
+        setUser(data.user)
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     async function fetchSessions() {
       try {
         setIsLoading(true);
@@ -74,6 +88,9 @@ export default function AnalyticsPage() {
         setIsLoading(false);
       }
     }
+
+    fetchUser();
+    if (user === null) return;
     fetchSessions();
   }, []);
 
@@ -114,7 +131,7 @@ export default function AnalyticsPage() {
     return { hours: (totalFocusTime / 60) | 0, minutes: totalFocusTime % 60 };
   }
 
-  if (isLoading || authLoading)
+  if (isLoading)
     return (
       <div className="flex flex-col items-center justify-center h-full w-full bg-[var(--background)] md:rounded">
         <h1 className="text-3xl font-bold mb-4 text-white">
@@ -141,7 +158,7 @@ export default function AnalyticsPage() {
         </h1>
         <div className="flex flex-col justify-right items-end w-full">
           <h1 className="text-6xl font-bold w-full items-start text-right px-4 pr-0">
-            {sessions.length}
+            {displaySessions.length}
           </h1>
           <h3 className="text-right justify-center text-gray-400 w-auto px-2">
             Total Sessions
@@ -163,7 +180,7 @@ export default function AnalyticsPage() {
           <LoginCTA message="Sign up or log in to track and save your own focus sessions. The data below is demo data." />
         </div>
       )}
-      
+
       {/* Charts section */}
       {displaySessions && displaySessions.length > 0 ? (
         <div className="flex flex-wrap justify-center gap-2 mb-5">

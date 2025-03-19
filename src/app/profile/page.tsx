@@ -1,18 +1,35 @@
 "use client";
 
-import { useAuth } from "../AuthContext";
 import Link from "next/link";
 import { Paper, Button, CircularProgress } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { getUser, signOut } from '../lib/supabaseClient'
+import { useEffect, useState } from "react";
+import { User } from '@supabase/supabase-js'
+import useRouter from 'next/navigation'
 
 export default function ProfileClient() {
-  const { user, isLoading, signOut } = useAuth();
-  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true)
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/");
-  };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data, error } = await getUser();
+        if (!data.user) {
+          throw error
+        } 
+        setUser(data.user)
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [])
+
+  
 
   if (isLoading) return (
     <div className="flex flex-col items-center justify-center h-full w-full bg-[var(--background)] md:rounded">
@@ -26,13 +43,15 @@ export default function ProfileClient() {
         <Paper className="p-10 text-center flex flex-col justify-center w-auto min-w-1/2 items-center rounded-lg shadow-lg text-2xl h-auto text-black gap-4">
           <h1 className="text-4xl">Welcome, {user.email}!</h1>
           <p className="text-lg">User ID: {user.id}</p>
-          <Button
-            onClick={handleSignOut}
-            variant="text"
+          <button 
+            onClick={() => {
+              signOut();
+              useRouter.redirect('/auth/login')
+            }}
             className="text-[var(--accent)] hover:text-[var(--accent)] rounded px-4 py-2 text-center"
           >
-            Logout
-          </Button>
+            Sign out
+          </button>
         </Paper>
       )}
       {!user && (

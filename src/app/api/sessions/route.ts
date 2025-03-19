@@ -7,10 +7,10 @@ export async function GET() {
     const supabase = await createClient();
     
     // Get the current user's session
-    const { data: { session } } = await supabase.auth.getSession();
+    const user = await supabase.auth.getUser();
     
     // Return empty array for anonymous users
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json([]);
     }
     
@@ -36,12 +36,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     const supabase = await createClient();
     
     // Get the current user's session
-    const { data: { session } } = await supabase.auth.getSession();
+    const user = await supabase.auth.getUser();
     
-    console.log('Session in POST route:', session ? 'Session exists' : 'No session');
+    console.log('Session in POST route:', user ? 'Session exists' : 'No session');
     
     // Only authenticated users can create sessions
-    if (!session?.user) {
+    if (!user) {
       console.log('No authenticated user found');
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -49,7 +49,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const focusSession: FocusSession = await request.json();
     
     // Ensure the user_id matches the authenticated user's ID
-    if (focusSession.user_id !== session.user.id) {
+    if (focusSession.user_id !== user.data.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
     
@@ -57,11 +57,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     const startTime = new Date(focusSession.start_time);
     
     // Log the user ID for debugging
-    console.log('User ID from session:', session.user.id);
+    console.log('User ID from session:', user.data.user.id);
     console.log('User ID from focus session:', focusSession.user_id);
     
     const { error } = await supabase.from('focus_sessions').insert({
-      user_id: session.user.id, // Use the authenticated user's ID as text
+      user_id: user.data.user.id, // Use the authenticated user's ID as text
       category: focusSession.category,
       duration: typeof focusSession.duration === 'number' 
         ? Math.floor(focusSession.duration) 

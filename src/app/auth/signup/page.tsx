@@ -8,11 +8,10 @@ import {
   Typography, 
   TextField, 
   Button, 
-  CircularProgress, 
   Alert,
   Box
 } from "@mui/material";
-import { useAuth } from "../../AuthContext";
+import { signUp } from './actions'
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -22,7 +21,6 @@ export default function SignupPage() {
   const [success, setSuccess] = useState("");
   
   const router = useRouter();
-  const { signUp, isLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +98,7 @@ export default function SignupPage() {
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading}
+            // disabled={isLoading}
             required
           />
           
@@ -110,7 +108,7 @@ export default function SignupPage() {
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
+            // disabled={isLoading}
             required
           />
           
@@ -120,7 +118,7 @@ export default function SignupPage() {
             fullWidth
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            disabled={isLoading}
+            // disabled={isLoading}
             required
           />
           
@@ -129,10 +127,10 @@ export default function SignupPage() {
             variant="contained"
             color="primary"
             fullWidth
-            disabled={isLoading}
+            // disabled={isLoading}
             className="bg-[var(--accent)]"
           >
-            {isLoading ? <CircularProgress size={24} /> : "Sign Up"}
+            {/* {isLoading ? <CircularProgress size={24} /> : "Sign Up"} */}
           </Button>
         </form>
         

@@ -8,12 +8,11 @@ import {
   Typography, 
   TextField, 
   Button, 
-  CircularProgress, 
   Alert,
   Box,
   Divider
 } from "@mui/material";
-import { useAuth } from "../../AuthContext";
+import { login } from './actions'
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -21,7 +20,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   
   const router = useRouter();
-  const { signIn, isLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +35,7 @@ export default function LoginPage() {
     
     try {
       // Use the AuthContext's signIn method
-      await signIn(email, password);
+      await login(email, password);
       
       // Redirect to timer page on successful login
       router.push("/timer");
@@ -74,7 +72,7 @@ export default function LoginPage() {
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading}
+            // disabled={isLoading}
             required
           />
           
@@ -84,7 +82,7 @@ export default function LoginPage() {
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
+            // disabled={isLoading}
             required
           />
           
@@ -93,10 +91,10 @@ export default function LoginPage() {
             variant="contained"
             color="primary"
             fullWidth
-            disabled={isLoading}
+            // disabled={isLoading}
             className="bg-[var(--accent)]"
           >
-            {isLoading ? <CircularProgress size={24} /> : "Log In"}
+            Log In
           </Button>
         </form>
         
@@ -119,7 +117,7 @@ export default function LoginPage() {
           variant="outlined"
           fullWidth
           onClick={handleGoogleSignIn}
-          disabled={isLoading}
+          // disabled={isLoading}
           className="mt-2"
         >
           Continue with Google

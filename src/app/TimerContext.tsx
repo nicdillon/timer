@@ -8,8 +8,10 @@ import React, {
   useRef,
   ReactNode,
 } from "react";
-import { useAuth } from "./AuthContext";
 import { FocusSession } from "./lib/dataTypes";
+import { User } from '@supabase/supabase-js'
+import { getUser } from './lib/supabaseClient'
+
 
 // Define types for each timer state
 interface TimerState {
@@ -42,7 +44,7 @@ interface TimerContextProps {
   isPaused: boolean;
   timerMode: "timer" | "stopwatch" | "pomodoro";
   setTimerMode: (mode: "timer" | "stopwatch" | "pomodoro") => void;
-  
+
   // Timer-specific state getters
   duration: number;
   timeLeft: number;
@@ -55,20 +57,20 @@ interface TimerContextProps {
     breakTime: number;
     isBreak: boolean;
   };
-  
+
   // Timer-specific state setters
   handleDurationChange: (duration: number) => void;
   handleCategoryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setPomodoroConfig: (config: { focusTime: number; breakTime: number; isBreak: boolean }) => void;
   setClockTypeForMode: (mode: "timer" | "stopwatch" | "pomodoro", clockType: "digital" | "analog") => void;
-  
+
   // Timer controls
   handleStart: () => void;
   handlePause: () => void;
   handleResume: () => void;
   handleStop: () => void;
   formatTime: (seconds: number) => string;
-  
+
   // Helper functions to get the appropriate state based on timer mode
   getTimeLeftForMode: (mode: "timer" | "stopwatch" | "pomodoro") => number;
   getDurationForMode: (mode: "timer" | "stopwatch" | "pomodoro") => number;
@@ -100,6 +102,8 @@ export function useTimerContext() {
 }
 
 export default function TimerProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   // This state ensures we only render on the client.
   const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => {
@@ -122,14 +126,14 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
       };
     },
   );
-  
+
   // Common state
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [timerMode, setTimerMode] = useState<
     "timer" | "stopwatch" | "pomodoro"
   >("timer");
-  
+
   // Separate state for each timer type
   const [timerState, setTimerState] = useState<TimerState>({
     duration: 25,
@@ -137,13 +141,13 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     category: "Focus",
     clockType: "digital"
   });
-  
+
   const [stopwatchState, setStopwatchState] = useState<StopwatchState>({
     elapsedTime: 0,
     category: "Focus",
     clockType: "digital"
   });
-  
+
   const [pomodoroState, setPomodoroState] = useState<PomodoroState>({
     focusTime: 25 * 60,
     breakTime: 5 * 60,
@@ -152,9 +156,8 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     timeLeft: 25 * 60,
     clockType: "digital"
   });
-  
+
   const hasFinished = useRef(false);
-  const { user, isLoading } = useAuth();
 
   // Load saved overlayPosition from localStorage on mount.
   useEffect(() => {
@@ -162,6 +165,20 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     if (savedOverlayPosition) {
       setOverlayPosition(JSON.parse(savedOverlayPosition));
     }
+
+    const fetchUser = async () => {
+      try {
+        const { data, error } = await getUser();
+        if (error) throw error;
+        setUser(data.user)
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   // Persist overlayPosition changes to localStorage.
@@ -176,24 +193,24 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     if (savedTimerState) {
       setTimerState(JSON.parse(savedTimerState));
     }
-    
+
     // Load stopwatch state
     const savedStopwatchState = localStorage.getItem("stopwatchState");
     if (savedStopwatchState) {
       setStopwatchState(JSON.parse(savedStopwatchState));
     }
-    
+
     // Load pomodoro state
     const savedPomodoroState = localStorage.getItem("pomodoroState");
     if (savedPomodoroState) {
       setPomodoroState(JSON.parse(savedPomodoroState));
     }
-    
+
     // Load common state
     const savedIsActive = localStorage.getItem("isActive");
     const savedIsPaused = localStorage.getItem("isPaused");
     const savedTimerMode = localStorage.getItem("timerMode");
-    
+
     if (savedIsActive) setIsActive(JSON.parse(savedIsActive));
     if (savedIsPaused) setIsPaused(JSON.parse(savedIsPaused));
     if (savedTimerMode) setTimerMode(JSON.parse(savedTimerMode) as "timer" | "stopwatch" | "pomodoro");
@@ -277,11 +294,12 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
 
   const handleStop = async () => {
     const userId = user ? user.id : null;
+    console.log('Saving Session. UserId:', userId)
 
     if (userId && !isLoading) {
       let sessionDuration = 0;
       let sessionCategory = "";
-      
+
       if (timerMode === "timer") {
         sessionDuration = Math.round((timerState.duration * 60 - timerState.timeLeft) / 60);
         sessionCategory = timerState.category;
@@ -323,7 +341,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
 
     setIsActive(false);
     setIsPaused(false);
-    
+
     // Reset the appropriate state based on timer mode
     if (timerMode === "timer") {
       setTimerState(prev => ({
@@ -355,7 +373,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newCategory = e.target.value;
-    
+
     if (timerMode === "timer") {
       setTimerState(prev => ({
         ...prev,
@@ -417,7 +435,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
 
     let sessionCategory = "";
     let sessionDuration = 0;
-    
+
     if (timerMode === "timer") {
       sessionCategory = timerState.category;
       sessionDuration = timerState.duration;
@@ -462,23 +480,23 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   const duration = timerMode === "timer" ? timerState.duration : 0;
   const timerTimeLeft = timerState.timeLeft;
   const pomodoroTimeLeft = pomodoroState.timeLeft;
-  const timeLeft = timerMode === "timer" 
-    ? timerState.timeLeft 
-    : timerMode === "pomodoro" 
-      ? pomodoroState.timeLeft 
+  const timeLeft = timerMode === "timer"
+    ? timerState.timeLeft
+    : timerMode === "pomodoro"
+      ? pomodoroState.timeLeft
       : 0;
   const elapsedTime = timerMode === "stopwatch" ? stopwatchState.elapsedTime : 0;
-  const category = timerMode === "timer" 
-    ? timerState.category 
-    : timerMode === "stopwatch" 
-      ? stopwatchState.category 
+  const category = timerMode === "timer"
+    ? timerState.category
+    : timerMode === "stopwatch"
+      ? stopwatchState.category
       : pomodoroState.category;
   const pomodoroConfig = {
     focusTime: Math.round(pomodoroState.focusTime / 60),
     breakTime: Math.round(pomodoroState.breakTime / 60),
     isBreak: pomodoroState.isBreak
   };
-  
+
   // Helper functions to get the appropriate state based on timer mode
   const getTimeLeftForMode = (mode: "timer" | "stopwatch" | "pomodoro") => {
     if (mode === "timer") {
@@ -490,7 +508,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     }
     return 0;
   };
-  
+
   const getDurationForMode = (mode: "timer" | "stopwatch" | "pomodoro") => {
     if (mode === "timer") {
       return timerState.duration;
@@ -499,7 +517,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     }
     return 0;
   };
-  
+
   const getCategoryForMode = (mode: "timer" | "stopwatch" | "pomodoro") => {
     if (mode === "timer") {
       return timerState.category;
@@ -510,7 +528,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     }
     return "";
   };
-  
+
   const getClockTypeForMode = (mode: "timer" | "stopwatch" | "pomodoro") => {
     if (mode === "timer") {
       return timerState.clockType;
@@ -521,7 +539,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     }
     return "digital";
   };
-  
+
   const setClockTypeForMode = (mode: "timer" | "stopwatch" | "pomodoro", clockType: "digital" | "analog") => {
     if (mode === "timer") {
       setTimerState(prev => ({

@@ -4,9 +4,9 @@ import { createClient } from '../../../lib/supabaseServer';
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const user = await supabase.auth.getUser();
     
-    return NextResponse.json({ session });
+    return NextResponse.json({ user });
   } catch (error) {
     console.error('Session error:', error);
     return NextResponse.json(
