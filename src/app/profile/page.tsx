@@ -2,34 +2,12 @@
 
 import Link from "next/link";
 import { Paper, Button, CircularProgress } from "@mui/material";
-import { getUser, signOut } from '../lib/supabaseClient'
-import { useEffect, useState } from "react";
-import { User } from '@supabase/supabase-js'
+import { signOut } from '../lib/supabaseClient'
 import useRouter from 'next/navigation'
+import { useAuth } from '../AuthContext'
 
 export default function ProfileClient() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const { data, error } = await getUser();
-        if (!data.user) {
-          throw error
-        } 
-        setUser(data.user)
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [])
-
-  
+  const {user, isLoading} = useAuth();
 
   if (isLoading) return (
     <div className="flex flex-col items-center justify-center h-full w-full bg-[var(--background)] md:rounded">

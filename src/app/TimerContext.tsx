@@ -9,8 +9,7 @@ import React, {
   ReactNode,
 } from "react";
 import { FocusSession } from "./lib/dataTypes";
-import { User } from '@supabase/supabase-js'
-import { getUser } from './lib/supabaseClient'
+import { useAuth } from './AuthContext'
 
 
 // Define types for each timer state
@@ -102,8 +101,7 @@ export function useTimerContext() {
 }
 
 export default function TimerProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const {user, isLoading} = useAuth();
   // This state ensures we only render on the client.
   const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => {
@@ -165,20 +163,6 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     if (savedOverlayPosition) {
       setOverlayPosition(JSON.parse(savedOverlayPosition));
     }
-
-    const fetchUser = async () => {
-      try {
-        const { data, error } = await getUser();
-        if (error) throw error;
-        setUser(data.user)
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUser();
   }, []);
 
   // Persist overlayPosition changes to localStorage.
@@ -294,7 +278,6 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
 
   const handleStop = async () => {
     const userId = user ? user.id : null;
-    console.log('Saving Session. UserId:', userId)
 
     if (userId && !isLoading) {
       let sessionDuration = 0;

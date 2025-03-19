@@ -28,16 +28,15 @@ import {
   aggregateLast7Days,
   aggregateSessionsByCategory,
 } from "../lib/aggregateStatistics";
-import { User } from '@supabase/supabase-js'
-import { getUser } from '../lib/supabaseClient'
+import { useAuth } from '../AuthContext'
 
 
 export default function AnalyticsPage() {
-  const [user, setUser] = useState<User | null>(null);
   const [sessions, setSessions] = useState<FocusSession[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isTableExpanded, setIsTableExpanded] = useState<boolean>(false);
+  const [sessionsAreLoading, setSessionsAreLoading] = useState<boolean>(true);
+  const { user } = useAuth();
 
   // Use demo data for anonymous users
   const displaySessions = user ? sessions : DEMO_SESSIONS;
@@ -55,22 +54,10 @@ export default function AnalyticsPage() {
 
   // Responsive chart width.
   const [chartWidth, setChartWidth] = useState(400);
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const { data, error } = await getUser();
-        if (error) throw error;
-        setUser(data.user)
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
+  useEffect(() => {
     async function fetchSessions() {
       try {
-        setIsLoading(true);
         const res = await fetch("/api/sessions");
         if (!res.ok) {
           const err = await res.json();
@@ -84,13 +71,11 @@ export default function AnalyticsPage() {
         } else {
           setError("An unknown error occurred");
         }
-      } finally {
-        setIsLoading(false);
       }
+      setSessionsAreLoading(false);
     }
 
-    fetchUser();
-    if (user === null) return;
+    if (!user) return;
     fetchSessions();
   }, []);
 
@@ -131,7 +116,7 @@ export default function AnalyticsPage() {
     return { hours: (totalFocusTime / 60) | 0, minutes: totalFocusTime % 60 };
   }
 
-  if (isLoading)
+  if (sessionsAreLoading)
     return (
       <div className="flex flex-col items-center justify-center h-full w-full bg-[var(--background)] md:rounded">
         <h1 className="text-3xl font-bold mb-4 text-white">
