@@ -109,7 +109,6 @@ export default function Timer({ timerMode }: TimerProps) {
             className={`z-45 h-auto w-full flex justify-center items-center ${isMinimized ? "hidden" : ""}`}
         >
             <div className={`bg-[var(--paper-background)] rounded-lg shadow-lg ${isMinimized ? "p-0" : "p-2"} h-auto flex flex-col items-center justify-center ${!isTimerPage && isMinimized ? "cursor-pointer" : ""}`}>
-
                 <div className="flex flex-col items-center h-auto w-auto justify-center">
                     <div className="mb-2 w-auto flex flex-col items-center justify-center">
                         <div className="mb-4 w-full flex justify-center items-center">

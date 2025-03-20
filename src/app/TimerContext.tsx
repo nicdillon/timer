@@ -264,6 +264,11 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   const handleStart = () => {
     setIsActive(true);
     setIsPaused(false);
+    if (timerMode === "pomodoro") setPomodoroState(prev => ({
+      ...prev,
+      isBreak: false,
+      timeLeft: prev.isBreak ? prev.breakTime : prev.focusTime
+    }));
     hasFinished.current = false;
   };
 
@@ -391,6 +396,14 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     if (timerMode === "pomodoro") {
       // Toggle between focus and break
       setPomodoroState(prev => {
+        if (prev.isBreak) {
+          setIsActive(false)
+          return {
+            ...prev,
+            timeLeft: 0
+          };
+        }
+        hasFinished.current = false;
         const newIsBreak = !prev.isBreak;
         return {
           ...prev,
@@ -412,7 +425,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     const userId = session?.user.id ?? null;
 
     if (!userId) {
-      console.error("User is not authenticated. Focus session not saved.");
+      console.warn("User is not authenticated. Focus session not saved.");
       return;
     }
 
@@ -457,6 +470,8 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error("Error saving focus session:", err);
     }
+    if (timerMode !== "pomodoro")
+      setIsActive(false);
   };
 
   // Computed properties to expose the current state based on timer mode

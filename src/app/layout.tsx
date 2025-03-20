@@ -16,7 +16,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className={`flex flex-col w-full justify-center items-start ${pathname === "/" || pathname === "" ? "" : "md:p-2 md:shadow-lg pl-0"} bg-[var(--foreground)]`}
+      className={`flex flex-col w-full justify-center items-start ${pathname === "/" || pathname === "" ? "" : "md:p-2 md:pl-0 md:shadow-lg"} pl-0 bg-[var(--foreground)]`}
     >
       <main className="flex-grow w-full">{children}</main>
     </div>

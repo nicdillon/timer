@@ -22,7 +22,7 @@ export default function TimerCarousel() {
   if (isActive) {
     return (
       <div className="w-full h-full flex justify-center items-center p-4">
-        <Timer timerMode={modes[currentIndex]} />
+        <Timer timerMode={timerMode} />
       </div>
     );
   }

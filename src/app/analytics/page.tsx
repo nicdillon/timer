@@ -142,22 +142,22 @@ export default function AnalyticsPage() {
   return (
     <div className="p-4 flex flex-col items-center justify-start h-full w-full bg-[var(--background)] rounded">
       <div className="flex flex-row justify-between items-stretch w-full mb-6">
-        <h1 className="text-6xl font-bold mb-4 w-full items-start px-4">
-          Analytics
+        <h1 className="text-3xl font-bold mb-4 w-full items-start p-0">
+          ANALYTICS
         </h1>
-        <div className="flex flex-col justify-right items-end w-full">
+        <div className="flex flex-col justify-right items-end w-1/4">
           <h1 className="text-6xl font-bold w-full items-start text-right px-4 pr-0">
             {displaySessions.length}
           </h1>
-          <h3 className="text-right justify-center text-gray-400 w-auto px-2">
+          <h3 className="text-right justify-center text-gray-400 w-auto px-2 uppercase font-bold">
             Total Sessions
           </h3>
         </div>
-        <div className="flex flex-col justify-right items-end w-full">
+        <div className="flex flex-col justify-right items-end w-1/4">
           <h1 className="text-6xl font-bold w-full items-start text-right px-4 pr-0">
             {totalFocusTime.hours + "h " + totalFocusTime.minutes + "m"}
           </h1>
-          <h3 className="text-left justify-center text-gray-400 w-auto px-2">
+          <h3 className="text-left justify-center text-gray-400 w-auto px-2 uppercase font-bold">
             Total Time
           </h3>
         </div>
@@ -172,14 +172,14 @@ export default function AnalyticsPage() {
 
       {/* Charts section */}
       {displaySessions && displaySessions.length > 0 ? (
-        <div className="flex flex-wrap justify-center gap-2 mb-5">
-          <Paper className="p-3 bg-none flex flex-wrap flex-col gap-4">
-            <h2 className="text-2xl text-left mb-2">Focus Time</h2>
+        <div className="grid flex-wrap flex-col justify-center gap-2 mb-5">
+          <div className="p-3 bg-none flex flex-wrapflex-grow gap-4 border-2 border-gray-700 rounded">
+            <h2 className="text-xl font-bold text-left mb-2">FOCUS TIME</h2>
             <Paper
               elevation={5}
               className="flex flex-col items-center justify-center pt-4 pb-4"
             >
-              <h3 className="text-gray-600 text-lg text-center mb-2">
+              <h3 className="text-gray-300 font-bold text-lg text-center mb-2 uppercase">
                 Focus Time last 7 Days
               </h3>
               <BarChart
@@ -205,8 +205,8 @@ export default function AnalyticsPage() {
               elevation={5}
               className="flex flex-col items-center justify-center pt-4 pb-4"
             >
-              <h3 className="text-gray-600 text-lg text-center mb-2">
-                Time by Category
+              <h3 className="text-gray-300 font-bold text-lg text-center mb-2 uppercase">
+                Category
               </h3>
               <PieChart
                 series={[
@@ -242,8 +242,8 @@ export default function AnalyticsPage() {
               elevation={5}
               className="flex flex-col items-center justify-center pt-4 pb-4"
             >
-              <h3 className="text-gray-600 text-lg text-center mb-2">
-                Time by Day of the Week
+              <h3 className="text-gray-300 font-bold text-lg text-center mb-2 uppercase">
+                Day of the Week
               </h3>
               <PieChart
                 series={[
@@ -274,19 +274,19 @@ export default function AnalyticsPage() {
                 }}
               />
             </Paper>
-          </Paper>
+          </div>
 
           {/* <Paper className="p-3">
             
           </Paper> */}
-          <Paper className="p-3 bg-none flex flex-wrap flex-col gap-4">
-            <h2 className="text-2xl text-left mb-2">Sessions</h2>
+          <div className="p-3 bg-none flex flex-wrap flex-grow gap-4 border-2 border-gray-700 rounded">
+            <h2 className="text-xl font-bold text-left mb-2">SESSIONS</h2>
             <Paper
               elevation={5}
               className="flex flex-col items-center justify-center pt-4 pb-4"
             >
-              <h3 className="text-gray-600 text-lg text-center mb-2">
-                Durations
+              <h3 className="text-gray-300 font-bold text-lg text-center mb-2 uppercase">
+                Duration
               </h3>
               <PieChart
                 series={[
@@ -321,8 +321,8 @@ export default function AnalyticsPage() {
               elevation={5}
               className="flex flex-col items-center justify-center pt-4 pb-4"
             >
-              <h3 className="text-gray-600 text-lg text-center mb-2">
-                Categories
+              <h3 className="text-gray-300 font-bold text-lg text-center mb-2 uppercase">
+                Category
               </h3>
               <PieChart
                 series={[
@@ -353,7 +353,7 @@ export default function AnalyticsPage() {
                 }}
               />
             </Paper>
-          </Paper>
+          </div>
         </div>
       ) : (
         <p className="text-lg text-gray-700 h-full text-center justify-center">No focus sessions found.</p>

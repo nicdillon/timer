@@ -55,9 +55,9 @@ export default function NavigationBar() {
                         href="/timer"
                         title="Timer"
                         onClick={() => setMenuOpen(false)}
-                        className={`flex justify-center items-center ${pathname !== "/timer" ? "text-[var(--background)]" : "text-[var(--accent)] bg-none"} hover:text-[var(--accent)] border border-none rounded p-1 text-center backdrop-blur-md shadow-lg`}
+                        className={`flex justify-center items-center ${pathname !== "/timer" ? "text-gray-800" : "text-[var(--accent)] bg-none shadow-inset"} hover:text-[var(--accent)] border border-none rounded-full p-1 text-center backdrop-blur-md shadow-lg`}
                     >
-                        <TimerIcon fontSize="large" />
+                        <TimerIcon fontSize="large" className={` ${pathname === "/timer" ? 'drop-shadow-[0_0_4px_rgba(51,102,255,0.6)]' : ''} hover:drop-shadow-[0_0_4px_rgba(51,102,255,0.6)] `} />
                     </Link>
                 </li>
                 <li className="mb-2 md:mb-0">
@@ -65,9 +65,9 @@ export default function NavigationBar() {
                         href="/analytics"
                         onClick={() => setMenuOpen(false)}
                         title="Analytics"
-                        className={`flex justify-center items-center ${pathname !== "/analytics" ? "text-black bg-white" : "text-[var(--accent)] bg-none"}  hover:text-[var(--accent)] border border-none rounded p-1 text-center  backdrop-blur-md shadow-lg`}
+                        className={`flex justify-center items-center ${pathname !== "/analytics" ? "text-gray-800" : "text-[var(--accent)] bg-none shadow-inset"}  hover:text-[var(--accent)] border border-none rounded-full p-1 text-center  backdrop-blur-md shadow-lg`}
                     >
-                        <AssessmentIcon fontSize="large" />
+                        <AssessmentIcon fontSize="large"  className={` ${pathname === "/analytics" ? 'drop-shadow-[0_0_4px_rgba(51,102,255,0.6)]' : ''} hover:drop-shadow-[0_0_4px_rgba(51,102,255,0.6)]`} />
                     </Link>
                 </li>
                 <li className="mb-2 md:mb-0">
@@ -75,16 +75,16 @@ export default function NavigationBar() {
                         href="/profile"
                         onClick={() => setMenuOpen(false)}
                         title="Profile"
-                        className={`flex justify-center items-center ${pathname !== "/profile" ? "text-black bg-white" : "text-[var(--accent)] bg-none"}  hover:text-[var(--accent)] border border-none rounded p-1 text-center   backdrop-blur-md shadow-lg`}
+                        className={`flex justify-center items-center ${pathname !== "/profile" ? "text-gray-800" : "text-[var(--accent)] bg-none shadow-inset"}  hover:text-[var(--accent)] border border-none rounded-full p-1 text-center   backdrop-blur-md shadow-lg`}
                     >
-                        <AccountBoxIcon fontSize="large" />
+                        <AccountBoxIcon fontSize="large" className={` ${pathname === "/profile" ? 'drop-shadow-[0_0_4px_rgba(51,102,255,0.6)]' : ''} hover:drop-shadow-[0_0_4px_rgba(51,102,255,0.6)]`} />
                     </Link>
                 </li>
             </ul>
             {session?.user && <button
                 onClick={signOut}
                 title="Signout"
-                className={`md:flex justify-center items-center text-[var(--background)] ${menuOpen ? "block" : "hidden"} bg-none  hover:text-[var(--accent)] border border-none rounded p-1 text-center   backdrop-blur-md shadow-lg`}
+                className={`md:flex justify-center items-center text-[var(--background)] ${menuOpen ? "block" : "hidden"} bg-none  hover:text-[var(--accent)] border border-none rounded-full p-1 text-center   backdrop-blur-md shadow-lg`}
             >
                 <LogoutIcon fontSize="large" />
             </button>}
