@@ -101,7 +101,7 @@ export function useTimerContext() {
 }
 
 export default function TimerProvider({ children }: { children: ReactNode }) {
-  const {user, isLoading} = useAuth();
+  const {session, isLoading} = useAuth();
   // This state ensures we only render on the client.
   const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => {
@@ -277,7 +277,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
   };
 
   const handleStop = async () => {
-    const userId = user ? user.id : null;
+    const userId = session?.user.id ?? null;
 
     if (userId && !isLoading) {
       let sessionDuration = 0;
@@ -409,7 +409,7 @@ export default function TimerProvider({ children }: { children: ReactNode }) {
 
     if (isLoading) return;
 
-    const userId = user ? user.id : null;
+    const userId = session?.user.id ?? null;
 
     if (!userId) {
       console.error("User is not authenticated. Focus session not saved.");

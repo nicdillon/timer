@@ -50,7 +50,7 @@ export default function SignupPage() {
       const error = await signup(email, password);
 
       if (error) {
-        setError(error)
+        setError(error.message)
         return;
       }
       
