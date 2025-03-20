@@ -7,7 +7,8 @@ import useRouter from 'next/navigation'
 import { useAuth } from '../AuthContext'
 
 export default function ProfileClient() {
-  const {user, isLoading} = useAuth();
+  const {session, isLoading} = useAuth();
+  const user = session?.user;
 
   if (isLoading) return (
     <div className="flex flex-col items-center justify-center h-full w-full bg-[var(--background)] md:rounded">
@@ -24,7 +25,7 @@ export default function ProfileClient() {
           <button 
             onClick={() => {
               signOut();
-              useRouter.redirect('/auth/login')
+              useRouter.redirect('/timer')
             }}
             className="text-[var(--accent)] hover:text-[var(--accent)] rounded px-4 py-2 text-center"
           >

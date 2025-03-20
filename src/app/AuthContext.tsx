@@ -1,36 +1,48 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { User } from "@supabase/supabase-js";
-import { getUser } from "./lib/supabaseClient";
+import { Session } from "@supabase/supabase-js";
+import { createClient } from "./lib/supabaseClient";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface AuthContextType {
-  user: User | null;
+  session: Session | null;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
-  user: null,
+  session: null,
   isLoading: true,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const supabase = createClient();
+
   useEffect(() => {
-    async function fetchUser() {
-      const { data, error } = await getUser();
-      if (!error) {
-        setUser(data.user);
-      }
-      setIsLoading(false);
+    const {data: { subscription }} = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log(event)
+        if (event === 'SIGNED_OUT') {
+          setSession(null)
+          toast.success("Signed Out", { autoClose: 1500})
+        } else if (session) {
+          setSession(session)
+        }
+      })
+
+      setIsLoading(false)
+
+    return () => {
+      subscription.unsubscribe()
     }
-    fetchUser();
-  }, []);
+  }, [supabase]);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading }}>
+    <AuthContext.Provider value={{ session, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

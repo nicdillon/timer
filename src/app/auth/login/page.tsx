@@ -3,40 +3,47 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
+import {
+  Paper,
+  Typography,
+  TextField,
+  Button,
   Alert,
   Box,
   Divider
 } from "@mui/material";
-import { login } from './actions'
+import { login } from '../../lib/supabaseClient';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  
+
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Reset states
     setError("");
-    
+
     // Validate form
     if (!email || !password) {
       setError("Email and password are required");
       return;
     }
-    
+
     try {
       // Use the AuthContext's signIn method
-      await login(email, password);
-      
+      const error = await login(email, password);
+
+      if (error && error.message === "Invalid login credentials") {
+        setError(error.message)
+        return;
+      }
+
+      if (error) throw error;
+
       // Redirect to timer page on successful login
       router.push("/timer");
     } catch (err) {
@@ -58,13 +65,13 @@ export default function LoginPage() {
         <Typography variant="h4" component="h1" align="center" gutterBottom>
           Log In
         </Typography>
-        
+
         {error && (
           <Alert severity="error" className="mb-4">
             {error}
           </Alert>
         )}
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <TextField
             label="Email"
@@ -75,7 +82,7 @@ export default function LoginPage() {
             // disabled={isLoading}
             required
           />
-          
+
           <TextField
             label="Password"
             type="password"
@@ -85,7 +92,7 @@ export default function LoginPage() {
             // disabled={isLoading}
             required
           />
-          
+
           <Button
             type="submit"
             variant="contained"
@@ -97,7 +104,7 @@ export default function LoginPage() {
             Log In
           </Button>
         </form>
-        
+
         <Box mt={3} textAlign="center">
           <Typography variant="body2">
             Don&apos;t have an account?{" "}
@@ -106,13 +113,13 @@ export default function LoginPage() {
             </Link>
           </Typography>
         </Box>
-        
+
         <Divider className="my-4">
           <Typography variant="body2" color="textSecondary">
             OR
           </Typography>
         </Divider>
-        
+
         <Button
           variant="outlined"
           fullWidth

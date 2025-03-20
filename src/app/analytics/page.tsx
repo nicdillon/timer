@@ -36,10 +36,10 @@ export default function AnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isTableExpanded, setIsTableExpanded] = useState<boolean>(false);
   const [sessionsAreLoading, setSessionsAreLoading] = useState<boolean>(true);
-  const { user } = useAuth();
+  const { session } = useAuth();
 
   // Use demo data for anonymous users
-  const displaySessions = user ? sessions : DEMO_SESSIONS;
+  const displaySessions = session ? sessions : DEMO_SESSIONS;
 
   const dataByCategory = aggregateTimeByCategory(displaySessions);
   const sessionsByCategory = aggregateSessionsByCategory(displaySessions);
@@ -75,7 +75,11 @@ export default function AnalyticsPage() {
       setSessionsAreLoading(false);
     }
 
-    if (!user) return;
+    if (!session?.user) {
+      setSessionsAreLoading(false);
+      return;
+    }
+
     fetchSessions();
   }, []);
 
@@ -160,7 +164,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Show login CTA for anonymous users */}
-      {!user && (
+      {!session?.user && (
         <div className="mb-6 w-full">
           <LoginCTA message="Sign up or log in to track and save your own focus sessions. The data below is demo data." />
         </div>

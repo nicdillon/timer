@@ -11,7 +11,7 @@ import {
   Alert,
   Box
 } from "@mui/material";
-import { signUp } from './actions'
+import { signup } from '../../lib/supabaseClient'
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -47,7 +47,12 @@ export default function SignupPage() {
     
     try {
       // Use the AuthContext's signUp method
-      await signUp(email, password);
+      const error = await signup(email, password);
+
+      if (error) {
+        setError(error)
+        return;
+      }
       
       setSuccess("Account created successfully! Please check your email for verification.");
       
